@@ -10,9 +10,22 @@
 		1B71AFC12D554D6C0014647A /* BatterySweeper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BatterySweeper.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		1BEB17572D56B32E003C7300 /* Exceptions for "BatterySweeper" folder in "BatterySweeper" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 1B71AFC02D554D6C0014647A /* BatterySweeper */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		1B71AFC32D554D6C0014647A /* BatterySweeper */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				1BEB17572D56B32E003C7300 /* Exceptions for "BatterySweeper" folder in "BatterySweeper" target */,
+			);
 			path = BatterySweeper;
 			sourceTree = "<group>";
 		};
@@ -257,6 +270,10 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = BatterySweeper/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Battery Sweeper";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -284,6 +301,10 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = BatterySweeper/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Battery Sweeper";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
