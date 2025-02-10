@@ -35,8 +35,6 @@ struct MenuBarView: View {
                 Text("Quit Battery Sweeper")
             }
         }
-        .buttonStyle(.plain)
-        .padding()
     }
 }
 
