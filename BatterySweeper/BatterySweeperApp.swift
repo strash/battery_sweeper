@@ -21,7 +21,7 @@ struct BatterySweeperApp: App {
     private var icon: String {
         get {
             if peripheralViewModel.centralState == .poweredOn {
-                if peripheralViewModel.activePeripheral != .none {
+                if peripheralViewModel.activePeripheral != nil {
                     return "minus.plus.batteryblock.fill"
                 }
                 return "minus.plus.batteryblock"
@@ -35,6 +35,6 @@ struct BatterySweeperApp: App {
             MenuBarView()
                 .environment(peripheralViewModel)
         }
-        .menuBarExtraStyle(.menu)
+        .menuBarExtraStyle(.window)
     }
 }

@@ -14,13 +14,13 @@ enum ESide: Equatable {
 }
 
 struct PeripheralModel: Identifiable, Equatable {
-    var id: String
+    var id: UUID
     var name: String
     var side: ESide
     var battery: Int
     
     init(from peripheral: CBPeripheral, side: ESide) {
-        id = peripheral.identifier.uuidString
+        id = peripheral.identifier
         name = peripheral.name ?? "--"
         self.side = side
         battery = 0
