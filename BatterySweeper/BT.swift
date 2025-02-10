@@ -17,10 +17,10 @@ class BTManager: NSObject, PBTManager, CBCentralManagerDelegate, CBPeripheralDel
     private let BT_BATTERY_CHARACTERISTICS_UUID = "0x2A19"
 
     private var centralManager: CBCentralManager!
-    private var discoveredPeripheral: Optional<CBPeripheral> = .none
+    private var discoveredPeripheral: CBPeripheral? = nil
     var availablePeripherals: Set<CBPeripheral> = []
     
-    private var subject: Optional<Subject> = nil
+    private var subject: Subject? = nil
 
     init(with subject: Subject) {
         super.init()
@@ -37,6 +37,9 @@ class BTManager: NSObject, PBTManager, CBCentralManagerDelegate, CBPeripheralDel
     // MARK: protocol
     
     func retrieveConnectedPeripherals() {
+        if self.centralManager.state != .poweredOn {
+            return
+        }
         let cbuuid = CBUUID(string: BT_BATTERY_SERVICE_UUID)
         let peripherals = centralManager.retrieveConnectedPeripherals(withServices: [cbuuid])
         for peripheral in peripherals {

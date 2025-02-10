@@ -16,7 +16,7 @@ class PeripheralViewModel: PObserver {
     
     var centralState: CBManagerState = .unknown
     var peripherals: [PeripheralModel] = []
-    var activePeripheral: Optional<PeripheralModel> = .none
+    var activePeripheral: PeripheralModel? = nil
     
     @ObservationIgnored private var btManager: PBTManager
     
@@ -25,28 +25,35 @@ class PeripheralViewModel: PObserver {
         subscribe(subject: subject)
     }
     
-    private func subscribe(subject: Subject) {
+    private func subscribe(subject: Subject) -> Void {
         sub = .some(subject.subscribe(self))
     }
     
-    func onData(_ event: EEvent) {
+    func retrieveConnectedPeripherals() -> Void {
+        btManager.retrieveConnectedPeripherals()
+    }
+    
+    func selectPeripheral(_ peripheral: PeripheralModel) -> Void {
+        if peripheral == activePeripheral {
+            activePeripheral = nil
+        } else {
+            activePeripheral = peripheral
+        }
+    }
+    
+    func onData(_ event: EEvent) -> Void {
         switch event {
         case .centralStateChanged(let state):
             centralState = state
             switch state {
             case .poweredOn:
-                self.btManager.retrieveConnectedPeripherals()
+                retrieveConnectedPeripherals()
             case _:
                 break;
             }
         case .peripheralsResieved(let peripherals):
             self.peripherals = peripherals.map {
-                PeripheralModel(
-                    id: $0.identifier,
-                    name: $0.name ?? "--",
-                    side: .unknown,
-                    battery: 0
-                )
+                .init(from: $0, side: .unknown)
             }
         }
     }

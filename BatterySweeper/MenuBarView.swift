@@ -13,11 +13,20 @@ struct MenuBarView: View {
     @Environment(PeripheralViewModel.self) private var viewModel
 
     var body: some View {
-        VStack {
-            ForEach(Array(viewModel.peripherals)) { per in
-                Text(per.name)
+        VStack(alignment: .leading) {
+            ForEach(viewModel.peripherals) { peripheral in
+                Button {
+                    viewModel.selectPeripheral(peripheral)
+                } label: {
+                    Text(peripheral.name)
+                        .foregroundStyle(
+                            viewModel.activePeripheral == peripheral ? .primary : .secondary
+                        )
+                }
             }
             
+            // TODO: refresh list
+
             Divider()
             
             Button{
@@ -26,6 +35,7 @@ struct MenuBarView: View {
                 Text("Quit Battery Sweeper")
             }
         }
+        .buttonStyle(.plain)
         .padding()
     }
 }

@@ -10,21 +10,28 @@ import SwiftUI
 @main
 struct BatterySweeperApp: App {
     private let subject: Subject = .init()
-    private let btManager: BTManager
+    private let btManager: PBTManager
     @State private var peripheralViewModel: PeripheralViewModel
     
     init() {
-        btManager = .init(with: subject)
+        btManager = BTManager.init(with: subject)
         peripheralViewModel = .init(btManager: btManager, subject: subject)
     }
     
+    private var icon: String {
+        get {
+            if peripheralViewModel.centralState == .poweredOn {
+                if peripheralViewModel.activePeripheral != .none {
+                    return "minus.plus.batteryblock.fill"
+                }
+                return "minus.plus.batteryblock"
+            }
+            return "batteryblock.slash"
+        }
+    }
+    
     var body: some Scene {
-        MenuBarExtra(
-            "Battery Sweeper",
-            systemImage: peripheralViewModel.centralState == .poweredOn
-            ? "minus.plus.batteryblock.fill"
-            : "batteryblock.slash"
-        ) {
+        MenuBarExtra("Battery Sweeper", systemImage: icon) {
             MenuBarView()
                 .environment(peripheralViewModel)
         }
