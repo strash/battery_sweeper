@@ -10,7 +10,9 @@ import CoreBluetooth
 
 enum EEvent {
     case centralStateChanged(CBManagerState)
-    case peripheralsResieved([CBPeripheral])
+    case peripheralDiscovered(CBPeripheral)
+    case connectedToPeripheral(CBPeripheral)
+    case disconnectedFromPeripheral(CBPeripheral)
 }
 
 protocol PObserver: AnyObject, Identifiable {

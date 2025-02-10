@@ -31,10 +31,14 @@ struct BatterySweeperApp: App {
     }
     
     var body: some Scene {
-        MenuBarExtra("Battery Sweeper", systemImage: icon) {
-            MenuBarView()
+        Window("Battery Sweeper", id: "main") {
+            MainView()
                 .environment(peripheralViewModel)
         }
-        .menuBarExtraStyle(.window)
+        
+        MenuBarExtra("Battery Sweeper", systemImage: icon) {
+            MenuBarView()
+        }
+        .menuBarExtraStyle(.menu)
     }
 }

@@ -8,22 +8,30 @@
 import Foundation
 import CoreBluetooth
 
-enum ESide: Equatable {
+enum ESide: Equatable, CaseIterable {
     case left, right
-    case unknown
+    case main
+}
+
+struct PeripheralSideModel: Identifiable, Equatable {
+    var id: Int
+    var side: ESide
+    var battery: Int
+    
+    static func ==(lhs: PeripheralSideModel, rhs: PeripheralSideModel) -> Bool {
+        lhs.side == rhs.side
+    }
 }
 
 struct PeripheralModel: Identifiable, Equatable {
     var id: UUID
     var name: String
-    var side: ESide
-    var battery: Int
+    var sides: [PeripheralSideModel]
     
-    init(from peripheral: CBPeripheral, side: ESide) {
+    init(from peripheral: CBPeripheral, sides: [PeripheralSideModel]) {
         id = peripheral.identifier
         name = peripheral.name ?? "--"
-        self.side = side
-        battery = 0
+        self.sides = sides
     }
     
     static func ==(lhs: PeripheralModel, rhs: PeripheralModel) -> Bool {
