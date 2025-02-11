@@ -12,18 +12,14 @@ struct MenuBarView: View {
     
     var body: some View {
         VStack {
-            Button {
+            Button("Open Battery Sweeper") {
                 openWindow(id: "main")
-            } label: {
-                Text("Open Battery Sweeper")
             }
 
             Divider()
             
-            Button {
+            Button("Quit") {
                 exit(0)
-            } label: {
-                Text("Quit")
             }
         }
     }

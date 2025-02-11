@@ -10,6 +10,20 @@ import SwiftUI
 struct MainView: View {
     @Environment(PeripheralViewModel.self) private var viewModel
     
+    private func battery(for peripheral: PeripheralModel) -> [CharacteristicModel.ECharacteristic] {
+        var chars: [CharacteristicModel.ECharacteristic] = []
+//        for c in peripheral.characteristics {
+//            print(c)
+//            switch c.characteristic {
+//            case .batteryLevel(let value):
+//                chars.append(.batteryLevel(value))
+//            default: continue
+//            }
+//        }
+        print(chars)
+        return chars
+    }
+    
     var body: some View {
         VStack {
             Button {
@@ -25,24 +39,20 @@ struct MainView: View {
             }
 
             ForEach(viewModel.peripherals) { peripheral in
-                Button {
+                Button(peripheral.name) {
                     viewModel.connectToPeripheral(peripheral)
-                } label: {
-                    Group {
-                        Text(peripheral.name)
-                            .lineLimit(1)
-                            .truncationMode(.tail)
-                        Spacer()
-                        ForEach(peripheral.sides) { side in
-                            switch(side.side) {
-                            case .left:
-                                Text("L: \(side.battery)%")
-                            case .right:
-                                Text("R: \(side.battery)%")
-                            case .main:
-                                Text("\(side.battery)%")
-                            }
-                        }
+                }
+            }
+            
+            HStack {
+                ForEach(viewModel.activeCharacteristics) { char in
+                    switch char.characteristic {
+                    case .batteryLevel(let value):
+                        Text("\(value)%")
+                    case .manufacturer(let value):
+                        Text(value)
+                    case .model(let value):
+                        Text(value)
                     }
                 }
             }

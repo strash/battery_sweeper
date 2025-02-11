@@ -5,20 +5,27 @@
 //  Created by Dmitry Poyarkov on 2/9/25.
 //
 
-import Foundation
-import Observation
-import CoreBluetooth
 import SwiftUI
+import CoreBluetooth
+
+protocol PBTManager {
+    func retrieveConnectedPeripherals() -> Void
+    func scanPeripherals() -> Void
+    func stopScan() -> Void
+    func connectToPeripheral(with uuid: UUID) -> Void
+}
 
 @Observable
-class PeripheralViewModel: PObserver {
-    private var sub: Optional<Result<Subscription, SubscriptionError>> = .none
+class PeripheralViewModel: PObserver, Identifiable {
+    let id: UUID = .init()
     
+    @ObservationIgnored private var sub: Result<Subscription, SubscriptionError>? = nil
+    @ObservationIgnored private var btManager: PBTManager
+
     var centralState: CBManagerState = .unknown
     var peripherals: [PeripheralModel] = []
     var activePeripheral: PeripheralModel? = nil
-    
-    @ObservationIgnored private var btManager: PBTManager
+    var activeCharacteristics: [CharacteristicModel] = []
     
     init(btManager: PBTManager, subject: Subject) {
         self.btManager = btManager
@@ -62,24 +69,19 @@ class PeripheralViewModel: PObserver {
                 break;
             }
         case .peripheralDiscovered(let peripheral):
-            guard !peripherals.contains(where: { $0.id == peripheral.identifier }) else {
-                break
+            if !peripherals.contains(where: { $0.id == peripheral.identifier }) {
+                peripherals.append(.init(from: peripheral))
             }
-            print("discovered:", peripheral)
-            peripherals.append(.init(from: peripheral, sides: [
-                .init(id: ESide.main.hashValue, side: .main, battery: 0)
-            ]))
         case .connectedToPeripheral(let cbPeripheral):
-            guard let peripheral = peripherals.first(where: { $0.id == cbPeripheral.identifier }) else {
-                break
+            if let peripheral = peripherals.first(where: { $0.id == cbPeripheral.identifier }) {
+                activePeripheral = peripheral
             }
-            print("connected to:", peripheral)
-            activePeripheral = peripheral
         case .disconnectedFromPeripheral(let cbPeripheral):
-            guard activePeripheral?.id == cbPeripheral.identifier else {
-                break
+            if activePeripheral?.id == cbPeripheral.identifier {
+                activePeripheral = nil
             }
-            activePeripheral = nil
+        case .characteristicDiscovered(let characteristics):
+            activeCharacteristics = characteristics.map { .init(from: $0) }
         }
     }
 }

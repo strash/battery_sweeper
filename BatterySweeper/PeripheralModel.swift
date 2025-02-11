@@ -5,33 +5,54 @@
 //  Created by Dmitry Poyarkov on 2/9/25.
 //
 
-import Foundation
 import CoreBluetooth
 
-enum ESide: Equatable, CaseIterable {
-    case left, right
-    case main
-}
+struct CharacteristicModel: Identifiable, Equatable {
+    enum ECharacteristic {
+        case batteryLevel(Int)
+        case manufacturer(String)
+        case model(String)
+    }
 
-struct PeripheralSideModel: Identifiable, Equatable {
-    var id: Int
-    var side: ESide
-    var battery: Int
+    let id: UUID = .init()
+    var characteristic: ECharacteristic
     
-    static func ==(lhs: PeripheralSideModel, rhs: PeripheralSideModel) -> Bool {
-        lhs.side == rhs.side
+    init(characteristic: ECharacteristic) {
+        self.characteristic = characteristic
+    }
+    
+    init(from characteristic: BTCharacteristic) {
+        switch characteristic.value {
+        case .batteryLevel(let value):
+            self.characteristic = .batteryLevel(value)
+        case .manufacturerName(let value):
+            self.characteristic = .manufacturer(value)
+        case .modelNumber(let value):
+            self.characteristic = .model(value)
+        }
+    }
+    
+    static func ==(lhs: CharacteristicModel, rhs: CharacteristicModel) -> Bool {
+        lhs.id == rhs.id
     }
 }
 
 struct PeripheralModel: Identifiable, Equatable {
     var id: UUID
     var name: String
-    var sides: [PeripheralSideModel]
     
-    init(from peripheral: CBPeripheral, sides: [PeripheralSideModel]) {
+    init(id: UUID, name: String, characteristics: [CharacteristicModel] = []) {
+        self.id = id
+        self.name = name
+    }
+    
+    init(from peripheral: CBPeripheral) {
         id = peripheral.identifier
         name = peripheral.name ?? "--"
-        self.sides = sides
+    }
+    
+    func copyWith(name: String? = nil) -> PeripheralModel {
+        return .init(id: id, name: name ?? self.name)
     }
     
     static func ==(lhs: PeripheralModel, rhs: PeripheralModel) -> Bool {

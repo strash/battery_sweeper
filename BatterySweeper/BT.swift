@@ -5,14 +5,17 @@
 //  Created by Dmitry Poyarkov on 2/6/25.
 //
 
-import Foundation
 import CoreBluetooth
 
-protocol PBTManager {
-    func retrieveConnectedPeripherals() -> Void
-    func scanPeripherals() -> Void
-    func stopScan() -> Void
-    func connectToPeripheral(with uuid: UUID) -> Void
+struct BTCharacteristic: Identifiable {
+    enum EBTCharacteristic {
+        case batteryLevel(Int)
+        case manufacturerName(String)
+        case modelNumber(String)
+    }
+    
+    var id: UUID
+    var value: EBTCharacteristic
 }
 
 class BTManager: NSObject, PBTManager, CBCentralManagerDelegate, CBPeripheralDelegate {
@@ -21,7 +24,6 @@ class BTManager: NSObject, PBTManager, CBCentralManagerDelegate, CBPeripheralDel
     private let BT_BATTERY_LEVEL_CHARACTERISTIC_UUID = "0x2A19"
     private let BT_MODEL_NUMBER_STRING_CHARACTERISTIC_UUID = "0x2A24"
     private let BT_MANUFACTURER_NAME_STRING_CHARACTERISTIC_UUID = "0x2A29"
-    private let BT_PNP_ID_CHARACTERISTIC_UUID = "0x2A50"
 
     private var centralManager: CBCentralManager!
     private var activePeripheral: CBPeripheral? = nil
@@ -162,35 +164,53 @@ class BTManager: NSObject, PBTManager, CBCentralManagerDelegate, CBPeripheralDel
     }
     
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: (any Error)?) -> Void {
-        guard let value = characteristic.value else {
-            return
-        }
-        let data = NSData(data: value)
-        var description: String = "--"
-        switch characteristic.uuid {
-        case batteryLevelCharacteristicUUID:
-            description = "\(data.bytes.load(as: Int.self))"
-        case modelNumberStringCharacteristicUUID,
-            manufacturerNameStringCharacteristicUUID:
-            description = String(data: value, encoding: .utf8) ?? "--"
-        default:
-            description = "--"
-        }
-        print("BT discovered value:",
-              peripheral.name ?? "--",
-              description,
-              "primary \(characteristic.service?.isPrimary ?? false)"
-        )
-        if characteristic.uuid == batteryLevelCharacteristicUUID {
+        if characteristic.uuid == batteryLevelCharacteristicUUID && !characteristic.isNotifying {
             peripheral.delegate = self
             peripheral.setNotifyValue(true, for: characteristic)
         }
+        subject?.notify(.characteristicDiscovered(
+            getCharacteristics(from: characteristic, for: peripheral.identifier))
+        )
     }
     
     func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: (any Error)?) -> Void {
+        // TODO: возможно нужно отпралять сообщение в субъект, что характеристика батареи перестала отправлять сообщения
         print("BT notification state for:",
               peripheral.name ?? "--",
               "notifying \(characteristic.isNotifying)"
         )
+    }
+    
+    private func getCharacteristics(from characteristic: CBCharacteristic, for id: UUID) -> [BTCharacteristic] {
+        var chars: [BTCharacteristic] = []
+        if let services = characteristic.service?.peripheral?.services {
+            for s in services {
+                if let characteristics = s.characteristics {
+                    for c in characteristics {
+                        guard let v = c.value else {
+                            continue
+                        }
+                        switch c.uuid {
+                        case batteryLevelCharacteristicUUID:
+                            let data = NSData(data: v)
+                            chars.append(.init(id: id, value: .batteryLevel(data.bytes.load(as: Int.self))))
+                        case manufacturerNameStringCharacteristicUUID:
+                            let value = String(data: v, encoding: .utf8)
+                            if let value {
+                                chars.append(.init(id: id, value: .manufacturerName(value)))
+                            }
+                        case modelNumberStringCharacteristicUUID:
+                            let value = String(data: v, encoding: .utf8)
+                            if let value {
+                                chars.append(.init(id: id, value: .modelNumber(value)))
+                            }
+                        default:
+                            continue
+                        }
+                    }
+                }
+            }
+        }
+        return chars
     }
 }

@@ -5,7 +5,6 @@
 //  Created by Dmitry Poyarkov on 2/9/25.
 //
 
-import Foundation
 import CoreBluetooth
 
 enum EEvent {
@@ -13,6 +12,7 @@ enum EEvent {
     case peripheralDiscovered(CBPeripheral)
     case connectedToPeripheral(CBPeripheral)
     case disconnectedFromPeripheral(CBPeripheral)
+    case characteristicDiscovered([BTCharacteristic])
 }
 
 protocol PObserver: AnyObject, Identifiable {
@@ -23,10 +23,7 @@ struct Subscription {
     private let _observer: any PObserver
     private let _cancel: (_ observer: any PObserver) -> Void
     
-    init(
-        observer: any PObserver,
-        cancel: @escaping (_ observer: any PObserver) -> Void
-    ) {
+    init(observer: any PObserver, cancel: @escaping (_ observer: any PObserver) -> Void) {
         _observer = observer
         _cancel = cancel
     }
