@@ -35,7 +35,9 @@ struct BatterySweeperApp: App {
             MainView()
                 .environment(peripheralViewModel)
         }
-        
+        .windowResizability(.contentMinSize)
+        .windowToolbarLabelStyle(fixed: .automatic)
+
         MenuBarExtra("Battery Sweeper", systemImage: icon) {
             MenuBarView()
         }

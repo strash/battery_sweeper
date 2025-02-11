@@ -54,8 +54,8 @@ class PeripheralViewModel: PObserver, Identifiable {
         btManager.stopScan()
     }
     
-    func connectToPeripheral(_ peripheral: PeripheralModel) -> Void {
-        btManager.connectToPeripheral(with: peripheral.id)
+    func connectToPeripheral(with id: UUID) -> Void {
+        btManager.connectToPeripheral(with: id)
     }
     
     func onData(_ event: EEvent) -> Void {
@@ -85,3 +85,23 @@ class PeripheralViewModel: PObserver, Identifiable {
         }
     }
 }
+
+#if DEBUG
+extension PeripheralViewModel {
+    convenience init() {
+        self.init(btManager: BTManager(with: .init()), subject: .init())
+        centralState = .poweredOn
+        peripherals = [
+            .init(id: .init(), name: "Sweep Test", isOn: false),
+            .init(id: .init(), name: "Iaei", isOn: false)
+        ]
+        activePeripheral = .init(id: .init(), name: "Sweep Test", isOn: false)
+        activeCharacteristics = [
+            .init(characteristic: .batteryLevel(54)),
+            .init(characteristic: .batteryLevel(25)),
+            .init(characteristic: .manufacturer("ZMK project")),
+            .init(characteristic: .model("Cradio")),
+        ]
+    }
+}
+#endif

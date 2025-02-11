@@ -96,12 +96,21 @@ class BTManager: NSObject, PBTManager, CBCentralManagerDelegate, CBPeripheralDel
     }
     
     func connectToPeripheral(with uuid: UUID) -> Void {
-        guard let peripheral = availablePeripherals.first(where: { $0.identifier == uuid }) else {
-            return
-        }
         if let activePeripheral {
+            if let services = activePeripheral.services {
+                for service in services {
+                    if let characteristics = service.characteristics {
+                        for characteristic in characteristics {
+                            activePeripheral.setNotifyValue(false, for: characteristic)
+                        }
+                    }
+                }
+            }
             centralManager.cancelPeripheralConnection(activePeripheral)
             subject?.notify(.disconnectedFromPeripheral(activePeripheral))
+        }
+        guard let peripheral = availablePeripherals.first(where: { $0.identifier == uuid }) else {
+            return
         }
         centralManager.connect(peripheral, options: nil)
     }
@@ -170,14 +179,6 @@ class BTManager: NSObject, PBTManager, CBCentralManagerDelegate, CBPeripheralDel
         }
         subject?.notify(.characteristicDiscovered(
             getCharacteristics(from: characteristic, for: peripheral.identifier))
-        )
-    }
-    
-    func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: (any Error)?) -> Void {
-        // TODO: возможно нужно отпралять сообщение в субъект, что характеристика батареи перестала отправлять сообщения
-        print("BT notification state for:",
-              peripheral.name ?? "--",
-              "notifying \(characteristic.isNotifying)"
         )
     }
     
