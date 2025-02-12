@@ -16,7 +16,7 @@ protocol PBTManager {
 }
 
 @Observable
-class PeripheralViewModel: PObserver, Identifiable {
+class PeripheralViewModel: PObserver, Identifiable, Equatable {
     let id: UUID = .init()
     
     @ObservationIgnored private var sub: Result<Subscription, SubscriptionError>? = nil
@@ -98,6 +98,13 @@ class PeripheralViewModel: PObserver, Identifiable {
             error = nil
         }
     }
+    
+    static func == (lhs: PeripheralViewModel, rhs: PeripheralViewModel) -> Bool {
+        lhs.id == rhs.id && lhs.centralState == rhs.centralState
+        && lhs.peripherals == rhs.peripherals
+        && lhs.activePeripheral == rhs.activePeripheral
+        && lhs.activeCharacteristics == rhs.activeCharacteristics
+    }
 }
 
 #if DEBUG
@@ -106,10 +113,10 @@ extension PeripheralViewModel {
         self.init(btManager: BTManager(with: .init()), subject: .init())
         centralState = .poweredOn
         peripherals = [
-            .init(id: .init(), name: "Sweep Test", isOn: false),
-            .init(id: .init(), name: "Iaei", isOn: false)
+            .init(id: .init(), name: "Sweep Test"),
+            .init(id: .init(), name: "Iaei")
         ]
-        activePeripheral = .init(id: .init(), name: "Sweep Test", isOn: false)
+        activePeripheral = .init(id: .init(), name: "Sweep Test")
         activeCharacteristics = [
             .init(characteristic: .batteryLevel(54)),
             .init(characteristic: .batteryLevel(25)),

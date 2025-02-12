@@ -10,7 +10,7 @@ import SwiftUI
 struct MainView: View {
     @Environment(PeripheralViewModel.self) private var viewModel
     @State private var isScanOn = false
-    @State private var activePer: UUID?
+    @State private var activePeripheral: UUID? = nil
     
     // TODO: show errors
     var body: some View {
@@ -42,21 +42,11 @@ struct MainView: View {
                         description: Text("Please select a device\nfrom the menu to continue.")
                     )
                     // -> peripherals
-                    Picker("", selection: $activePer) {
-                        ForEach(viewModel.peripherals) { peripheral in
-                            Text(peripheral.name).tag(peripheral.id)
-                        }
-                    }
-                    .pickerStyle(.menu)
-                    .frame(maxWidth: 200)
-                    .help("Devices")
-                    .onChange(of: activePer) { _, id in
-                        if let id {
-                            withAnimation(.easeInOut(duration: 0.15)) {
-                                viewModel.connectToPeripheral(with: id)
-                            }
-                        }
-                    }
+                    PeripheralPickerView(
+                        "",
+                        selection: $activePeripheral,
+                        maxWidth: 200,
+                        help: "Devices")
                 }
             }
         }
@@ -65,21 +55,11 @@ struct MainView: View {
         .toolbar {
             ToolbarItemGroup {
                 // -> peripherals
-                Picker("Devices", selection: $activePer) {
-                    ForEach(viewModel.peripherals) { peripheral in
-                        Text(peripheral.name).tag(peripheral.id)
-                    }
-                }
-                .pickerStyle(.menu)
-                .frame(minWidth: 100)
-                .help("Devices")
-                .onChange(of: activePer) { _, id in
-                    if let id {
-                        withAnimation(.easeInOut(duration: 0.15)) {
-                            viewModel.connectToPeripheral(with: id)
-                        }
-                    }
-                }
+                PeripheralPickerView(
+                    "Devices",
+                    selection: $activePeripheral,
+                    maxWidth: 100,
+                    help: "Devices")
 
                 // -> scan
                 Button {
@@ -99,6 +79,30 @@ struct MainView: View {
         }
         .padding()
         .frame(minWidth: 450.0, idealHeight: 350.0)
+        
+        .onChange(of: activePeripheral) { _, id in
+            if let id {
+                withAnimation(.easeInOut(duration: 0.15)) {
+                    viewModel.connectToPeripheral(with: id)
+                }
+            }
+        }
+        
+        .onChange(of: viewModel.centralState) {
+            if viewModel.centralState != .poweredOn {
+                activePeripheral = nil
+            }
+        }
+        .onChange(of: viewModel.activePeripheral) {
+            if viewModel.activePeripheral == nil {
+                activePeripheral = nil
+            }
+        }
+        .onChange(of: viewModel.peripherals) {
+            if viewModel.peripherals.isEmpty {
+                activePeripheral = nil
+            }
+        }
     }
     
     private var batteryLevel: String {

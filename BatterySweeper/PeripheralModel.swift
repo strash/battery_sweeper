@@ -40,28 +40,18 @@ struct CharacteristicModel: Identifiable, Equatable {
 struct PeripheralModel: Identifiable, Equatable, Hashable {
     var id: UUID
     var name: String
-    var inOn: Bool
     
-    init(id: UUID, name: String, isOn: Bool) {
+    init(id: UUID, name: String) {
         self.id = id
         self.name = name
-        self.inOn = isOn
     }
     
     init(from peripheral: CBPeripheral) {
-        self.init(
-            id: peripheral.identifier,
-            name: peripheral.name ?? "--",
-            isOn: false
-        )
+        self.init(id: peripheral.identifier, name: peripheral.name ?? "--")
     }
     
-    func copyWith(name: String? = nil, isOn: Bool = false) -> PeripheralModel {
-        .init(
-            id: id,
-            name: name ?? self.name,
-            isOn: isOn
-        )
+    func copyWith(name: String? = nil) -> PeripheralModel {
+        .init(id: id, name: name ?? self.name)
     }
     
     static func ==(lhs: PeripheralModel, rhs: PeripheralModel) -> Bool {
