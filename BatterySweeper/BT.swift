@@ -94,7 +94,7 @@ class BTManager: NSObject, PBTManager, CBCentralManagerDelegate, CBPeripheralDel
     }
     
     func stopScan() -> Void {
-        guard centralManager.isScanning else {
+        guard centralManager.state == .poweredOn &&  centralManager.isScanning else {
             return
         }
         centralManager.stopScan()
@@ -108,7 +108,10 @@ class BTManager: NSObject, PBTManager, CBCentralManagerDelegate, CBPeripheralDel
         guard let peripheral = availablePeripherals.first(where: { $0.identifier == uuid }) else {
             return
         }
-        centralManager.connect(peripheral, options: nil)
+        centralManager.connect(
+            peripheral,
+            options: [CBConnectPeripheralOptionEnableAutoReconnect: true]
+        )
     }
     
     // MARK: bt shits
@@ -150,19 +153,45 @@ class BTManager: NSObject, PBTManager, CBCentralManagerDelegate, CBPeripheralDel
     // on fail to connect to a peripheral
     func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: (any Error)?) {
         if let error {
-            subject?.notify(.failToConnectToPeripheral(peripheral, error))
             print(error)
             return
         }
+        subject?.notify(.failToConnectToPeripheral(peripheral, error))
     }
     
     // on disconnect from a peripheral
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: (any Error)?) {
+        if let error {
+            print(error)
+            return
+        }
         subject?.notify(.disconnectedFromPeripheral(peripheral))
+    }
+    
+    // on reconnect
+    func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, timestamp: CFAbsoluteTime, isReconnecting: Bool, error: (any Error)?) {
+        if let error {
+            print(error)
+            return
+        }
+        if isReconnecting {
+            subject?.notify(.connectedToPeripheral(peripheral))
+        }
+    }
+    
+    func peripheralDidUpdateName(_ peripheral: CBPeripheral) {
+        let index = availablePeripherals.firstIndex(where: { $0.identifier == peripheral.identifier })
+        if let index {
+            availablePeripherals[index] = peripheral
+        }
+        if let activePeripheral, activePeripheral.identifier == peripheral.identifier {
+            self.activePeripheral = peripheral
+        }
+        subject?.notify(.peripheralUpdated(peripheral))
     }
 
     // on discover a services
-    func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) -> Void {
+    func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: (any Error)?) -> Void {
         if let error {
             print(error)
             return
@@ -183,7 +212,7 @@ class BTManager: NSObject, PBTManager, CBCentralManagerDelegate, CBPeripheralDel
     }
     
     // on discover a characteristics
-    func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) -> Void {
+    func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: (any Error)?) -> Void {
         if let error {
             print(error)
             return
@@ -197,7 +226,7 @@ class BTManager: NSObject, PBTManager, CBCentralManagerDelegate, CBPeripheralDel
         }
     }
     
-    // on discover a value
+    // on discover or change of a value
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: (any Error)?) -> Void {
         if let error {
             print(error)

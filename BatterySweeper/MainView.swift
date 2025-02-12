@@ -9,17 +9,14 @@ import SwiftUI
 
 struct MainView: View {
     @Environment(PeripheralViewModel.self) private var viewModel
-    @State private var isScanOn = false
-    @State private var activePeripheral: UUID? = nil
     
-    // TODO: show errors
     var body: some View {
         Group {
-            if let active = viewModel.activePeripheral {
+            if let peripheral = viewModel.activePeripheral {
                 // -> active peripheral
                 VStack(alignment: .leading, spacing: 3.0) {
                     // -> name
-                    Text(active.name)
+                    Text(peripheral.name)
                         .font(.title)
                         .fontWeight(.medium)
                     
@@ -32,21 +29,14 @@ struct MainView: View {
                     Text(batteryLevel)
                         .fontWeight(.medium)
                 }
-                .contentTransition(.opacity)
             } else {
                 // -> empty state
-                VStack {
-                    ContentUnavailableView(
-                        "Welcome!",
-                        systemImage: "keyboard",
-                        description: Text("Please select a device\nfrom the menu to continue.")
-                    )
-                    // -> peripherals
-                    PeripheralPickerView(
-                        "",
-                        selection: $activePeripheral,
-                        maxWidth: 200,
-                        help: "Devices")
+                if viewModel.centralState == .poweredOn && !viewModel.peripherals.isEmpty {
+                    WelcomeEmptyStateView()
+                } else if viewModel.centralState != .poweredOn {
+                    PowerOffEmptyStateView()
+                } else {
+                    RefreshPeripheralsEmptyStateView()
                 }
             }
         }
@@ -55,54 +45,28 @@ struct MainView: View {
         .toolbar {
             ToolbarItemGroup {
                 // -> peripherals
-                PeripheralPickerView(
-                    "Devices",
-                    selection: $activePeripheral,
-                    maxWidth: 100,
-                    help: "Devices")
+                PeripheralPickerView("Devices", maxWidth: 100, help: "Devices")
+                    .disabled(viewModel.centralState != .poweredOn)
 
                 // -> scan
                 Button {
-                    if isScanOn {
+                    if viewModel.isScanning {
                         viewModel.scanPeripherals()
                     } else {
                         viewModel.stopScan()
                     }
-                    isScanOn.toggle()
+                    viewModel.isScanning.toggle()
                 } label: {
                     Image(systemName: "antenna.radiowaves.left.and.right")
                         .frame(minWidth: 30, alignment: .center)
-                        .symbolEffect(.variableColor, isActive: isScanOn)
+                        .symbolEffect(.variableColor, isActive: viewModel.isScanning)
                 }
-                .help(isScanOn ? "Stop" : "Scan for devices")
+                .help(viewModel.isScanning ? "Stop" : "Scan for devices")
+                .disabled(viewModel.centralState != .poweredOn)
             }
         }
         .padding()
         .frame(minWidth: 450.0, idealHeight: 350.0)
-        
-        .onChange(of: activePeripheral) { _, id in
-            if let id {
-                withAnimation(.easeInOut(duration: 0.15)) {
-                    viewModel.connectToPeripheral(with: id)
-                }
-            }
-        }
-        
-        .onChange(of: viewModel.centralState) {
-            if viewModel.centralState != .poweredOn {
-                activePeripheral = nil
-            }
-        }
-        .onChange(of: viewModel.activePeripheral) {
-            if viewModel.activePeripheral == nil {
-                activePeripheral = nil
-            }
-        }
-        .onChange(of: viewModel.peripherals) {
-            if viewModel.peripherals.isEmpty {
-                activePeripheral = nil
-            }
-        }
     }
     
     private var batteryLevel: String {

@@ -13,6 +13,7 @@ enum EEvent {
     case connectedToPeripheral(CBPeripheral)
     case failToConnectToPeripheral(CBPeripheral, (any Error)?)
     case disconnectedFromPeripheral(CBPeripheral)
+    case peripheralUpdated(CBPeripheral)
     case characteristicDiscovered([BTCharacteristic])
 }
 

@@ -8,7 +8,7 @@
 import CoreBluetooth
 
 struct CharacteristicModel: Identifiable, Equatable {
-    enum ECharacteristic {
+    enum ECharacteristic: Equatable {
         case batteryLevel(Int)
         case manufacturer(String)
         case model(String)
@@ -33,7 +33,7 @@ struct CharacteristicModel: Identifiable, Equatable {
     }
     
     static func ==(lhs: CharacteristicModel, rhs: CharacteristicModel) -> Bool {
-        lhs.id == rhs.id
+        lhs.id == rhs.id && lhs.characteristic == rhs.characteristic
     }
 }
 
@@ -55,6 +55,6 @@ struct PeripheralModel: Identifiable, Equatable, Hashable {
     }
     
     static func ==(lhs: PeripheralModel, rhs: PeripheralModel) -> Bool {
-        lhs.id == rhs.id
+        lhs.id == rhs.id && lhs.name == rhs.name
     }
 }

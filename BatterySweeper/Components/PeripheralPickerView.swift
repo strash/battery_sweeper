@@ -9,23 +9,31 @@ import SwiftUI
 
 struct PeripheralPickerView: View {
     @Environment(PeripheralViewModel.self) private var viewModel
-    @Binding var selection: UUID?
-    
+
     let label: String
     let maxWidth: Double
     let help: String
     
-    init(_ label: String, selection: Binding<UUID?>, maxWidth: Double, help: String) {
-        self._selection = selection
+    init(_ label: String, maxWidth: Double, help: String) {
         self.label = label
         self.maxWidth = maxWidth
         self.help = help
     }
     
     var body: some View {
-        Picker(label, selection: $selection) {
+        let activePeripheral = Binding(
+            get: { viewModel.activePeripheral },
+            set: {
+                viewModel.activePeripheral = $0
+                if let peripheral = $0 {
+                    viewModel.connectToPeripheral(with: peripheral.id)
+                }
+            }
+        )
+        
+        Picker(label, selection: activePeripheral) {
             ForEach(viewModel.peripherals) { peripheral in
-                Text(peripheral.name).tag(Optional(peripheral.id))
+                Text(peripheral.name).tag(Optional(peripheral))
             }
         }
         .pickerStyle(.menu)
@@ -35,7 +43,5 @@ struct PeripheralPickerView: View {
 }
 
 #Preview {
-    @Previewable @State var bind: UUID?
-    
-    PeripheralPickerView("Label", selection: $bind, maxWidth: 200, help: "Devices")
+    PeripheralPickerView("Label", maxWidth: 200, help: "Devices")
 }

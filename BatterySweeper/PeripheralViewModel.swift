@@ -26,6 +26,7 @@ class PeripheralViewModel: PObserver, Identifiable, Equatable {
     var peripherals: [PeripheralModel] = []
     var activePeripheral: PeripheralModel? = nil
     var activeCharacteristics: [CharacteristicModel] = []
+    var isScanning: Bool = false
     
     var error: (any Error)? = nil
     
@@ -49,11 +50,14 @@ class PeripheralViewModel: PObserver, Identifiable, Equatable {
     }
     
     func scanPeripherals() -> Void {
+        btManager.retrieveConnectedPeripherals()
         btManager.scanPeripherals()
+        isScanning = true
     }
     
     func stopScan() -> Void {
         btManager.stopScan()
+        isScanning = false
     }
     
     func connectToPeripheral(with id: UUID) -> Void {
@@ -70,32 +74,47 @@ class PeripheralViewModel: PObserver, Identifiable, Equatable {
                 error = nil
             case _:
                 // TODO: maybe show errors
-                break;
+                peripherals.removeAll()
+                activePeripheral = nil
             }
+            
         case .peripheralDiscovered(let peripheral):
             if !peripherals.contains(where: { $0.id == peripheral.identifier }) {
                 peripherals.append(.init(from: peripheral))
             }
             error = nil
+            
         case .connectedToPeripheral(let cbPeripheral):
             if let peripheral = peripherals.first(where: { $0.id == cbPeripheral.identifier }) {
                 activePeripheral = peripheral
                 activeCharacteristics.removeAll()
             }
             error = nil
+            
         case .failToConnectToPeripheral(_, let error):
             self.activePeripheral = nil
             activeCharacteristics.removeAll()
             self.error = error
+            
         case .disconnectedFromPeripheral(let cbPeripheral):
             if let activePeripheral, activePeripheral.id == cbPeripheral.identifier {
                 self.activePeripheral = nil
                 activeCharacteristics.removeAll()
             }
             error = nil
+        
+        case .peripheralUpdated(let cbPeripheral):
+            peripherals = peripherals.map {
+                $0.id == cbPeripheral.identifier ? .init(from: cbPeripheral) : $0
+            }
+            if let activePeripheral, activePeripheral.id == cbPeripheral.identifier {
+                self.activePeripheral = .init(from: cbPeripheral)
+            }
+            
         case .characteristicDiscovered(let characteristics):
             activeCharacteristics = characteristics.map { .init(from: $0) }
             error = nil
+            
         }
     }
     
