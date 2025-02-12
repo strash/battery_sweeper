@@ -13,40 +13,70 @@ struct MainView: View {
     @State private var activePer: UUID?
     
     var body: some View {
-        // -> active peripheral
-        VStack(alignment: .leading, spacing: 3.0) {
+        Group {
             if let active = viewModel.activePeripheral {
-                Group {
+                // -> active peripheral
+                VStack(alignment: .leading, spacing: 3.0) {
                     // -> name
                     Text(active.name)
                         .font(.title)
-                        .padding(.bottom)
-                    
-                    // -> battery levels
-                    Text(batteryLevel)
+                        .fontWeight(.medium)
                     
                     // -> model and manufacturer name
                     Text(modelName)
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(.secondary)
+                        .padding(.bottom)
+
+                    // -> battery levels
+                    Text(batteryLevel)
+                        .fontWeight(.medium)
                 }
                 .contentTransition(.opacity)
+            } else {
+                // -> empty state
+                VStack {
+                    ContentUnavailableView(
+                        "Welcome!",
+                        systemImage: "keyboard",
+                        description: Text("Please select a device\nfrom the menu to continue.")
+                    )
+                    // -> peripherals
+                    Picker("", selection: $activePer) {
+                        ForEach(viewModel.peripherals) { peripheral in
+                            Text(peripheral.name).tag(peripheral.id)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .frame(maxWidth: 200)
+                    .help("Devices")
+                    .onChange(of: activePer) { _, id in
+                        if let id {
+                            withAnimation(.easeInOut(duration: 0.15)) {
+                                viewModel.connectToPeripheral(with: id)
+                            }
+                        }
+                    }
+                }
             }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+
         .toolbar {
             ToolbarItemGroup {
                 // -> peripherals
-                Picker("Peripherals", selection: $activePer) {
+                Picker("Devices", selection: $activePer) {
                     ForEach(viewModel.peripherals) { peripheral in
                         Text(peripheral.name).tag(peripheral.id)
                     }
                 }
                 .pickerStyle(.menu)
                 .frame(minWidth: 100)
-                .help("Peripherals")
+                .help("Devices")
                 .onChange(of: activePer) { _, id in
                     if let id {
-                        viewModel.connectToPeripheral(with: id)
+                        withAnimation(.easeInOut(duration: 0.15)) {
+                            viewModel.connectToPeripheral(with: id)
+                        }
                     }
                 }
 
@@ -67,7 +97,7 @@ struct MainView: View {
             }
         }
         .padding()
-        .frame(minWidth: 450.0)
+        .frame(minWidth: 450.0, idealHeight: 200.0)
     }
     
     private var batteryLevel: String {
