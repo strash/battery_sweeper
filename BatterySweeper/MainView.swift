@@ -12,6 +12,7 @@ struct MainView: View {
     @State private var isScanOn = false
     @State private var activePer: UUID?
     
+    // TODO: show errors
     var body: some View {
         Group {
             if let active = viewModel.activePeripheral {
@@ -93,11 +94,11 @@ struct MainView: View {
                         .frame(minWidth: 30, alignment: .center)
                         .symbolEffect(.variableColor, isActive: isScanOn)
                 }
-                .help(isScanOn ? "Stop" : "Scan for peripherals")
+                .help(isScanOn ? "Stop" : "Scan for devices")
             }
         }
         .padding()
-        .frame(minWidth: 450.0, idealHeight: 200.0)
+        .frame(minWidth: 450.0, idealHeight: 350.0)
     }
     
     private var batteryLevel: String {

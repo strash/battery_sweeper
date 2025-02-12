@@ -27,6 +27,8 @@ class PeripheralViewModel: PObserver, Identifiable {
     var activePeripheral: PeripheralModel? = nil
     var activeCharacteristics: [CharacteristicModel] = []
     
+    var error: (any Error)? = nil
+    
     init(btManager: PBTManager, subject: Subject) {
         self.btManager = btManager
         subscribe(subject: subject)
@@ -65,23 +67,35 @@ class PeripheralViewModel: PObserver, Identifiable {
             switch state {
             case .poweredOn:
                 retrieveConnectedPeripherals()
+                error = nil
             case _:
+                // TODO: maybe show errors
                 break;
             }
         case .peripheralDiscovered(let peripheral):
             if !peripherals.contains(where: { $0.id == peripheral.identifier }) {
                 peripherals.append(.init(from: peripheral))
             }
+            error = nil
         case .connectedToPeripheral(let cbPeripheral):
             if let peripheral = peripherals.first(where: { $0.id == cbPeripheral.identifier }) {
                 activePeripheral = peripheral
+                activeCharacteristics.removeAll()
             }
+            error = nil
+        case .failToConnectToPeripheral(_, let error):
+            self.activePeripheral = nil
+            activeCharacteristics.removeAll()
+            self.error = error
         case .disconnectedFromPeripheral(let cbPeripheral):
-            if activePeripheral?.id == cbPeripheral.identifier {
-                activePeripheral = nil
+            if let activePeripheral, activePeripheral.id == cbPeripheral.identifier {
+                self.activePeripheral = nil
+                activeCharacteristics.removeAll()
             }
+            error = nil
         case .characteristicDiscovered(let characteristics):
             activeCharacteristics = characteristics.map { .init(from: $0) }
+            error = nil
         }
     }
 }

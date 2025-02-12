@@ -38,9 +38,14 @@ class BTManager: NSObject, PBTManager, CBCentralManagerDelegate, CBPeripheralDel
     }
     
     deinit {
-        for peripheral in availablePeripherals {
-            self.centralManager.cancelPeripheralConnection(peripheral)
+        if let activePeripheral {
+            disconnectAndCancel(activePeripheral)
+            self.activePeripheral = nil
         }
+        for peripheral in availablePeripherals {
+            disconnectAndCancel(peripheral)
+        }
+        availablePeripherals.removeAll()
     }
     
     private var batteryServiceUUID: CBUUID {
@@ -97,17 +102,8 @@ class BTManager: NSObject, PBTManager, CBCentralManagerDelegate, CBPeripheralDel
     
     func connectToPeripheral(with uuid: UUID) -> Void {
         if let activePeripheral {
-            if let services = activePeripheral.services {
-                for service in services {
-                    if let characteristics = service.characteristics {
-                        for characteristic in characteristics {
-                            activePeripheral.setNotifyValue(false, for: characteristic)
-                        }
-                    }
-                }
-            }
-            centralManager.cancelPeripheralConnection(activePeripheral)
-            subject?.notify(.disconnectedFromPeripheral(activePeripheral))
+            disconnectAndCancel(activePeripheral)
+            self.activePeripheral = nil
         }
         guard let peripheral = availablePeripherals.first(where: { $0.identifier == uuid }) else {
             return
@@ -117,6 +113,7 @@ class BTManager: NSObject, PBTManager, CBCentralManagerDelegate, CBPeripheralDel
     
     // MARK: bt shits
     
+    // on update state
     func centralManagerDidUpdateState(_ central: CBCentralManager) -> Void {
         subject?.notify(.centralStateChanged(central.state))
         switch central.state {
@@ -124,29 +121,52 @@ class BTManager: NSObject, PBTManager, CBCentralManagerDelegate, CBPeripheralDel
             break
         default:
             if let activePeripheral {
-                centralManager.cancelPeripheralConnection(activePeripheral)
+                disconnectAndCancel(activePeripheral)
+                self.activePeripheral = nil
+                subject?.notify(.disconnectedFromPeripheral(activePeripheral))
             }
             for peripheral in availablePeripherals {
-                centralManager.cancelPeripheralConnection(peripheral)
+                disconnectAndCancel(peripheral)
             }
             availablePeripherals.removeAll()
         }
     }
     
+    // on discover a peripheral
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) -> Void {
         availablePeripherals.append(peripheral)
         peripheral.delegate = self
         subject?.notify(.peripheralDiscovered(peripheral))
     }
     
+    // on connect to a peripheral
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) -> Void {
         activePeripheral = peripheral
-        subject?.notify(.connectedToPeripheral(peripheral))
         peripheral.delegate = self
         peripheral.discoverServices([batteryServiceUUID, deviceInformationServiceUUID])
+        subject?.notify(.connectedToPeripheral(peripheral))
     }
     
+    // on fail to connect to a peripheral
+    func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: (any Error)?) {
+        if let error {
+            subject?.notify(.failToConnectToPeripheral(peripheral, error))
+            print(error)
+            return
+        }
+    }
+    
+    // on disconnect from a peripheral
+    func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: (any Error)?) {
+        subject?.notify(.disconnectedFromPeripheral(peripheral))
+    }
+
+    // on discover a services
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) -> Void {
+        if let error {
+            print(error)
+            return
+        }
         guard let services = peripheral.services else {
             return
         }
@@ -162,7 +182,12 @@ class BTManager: NSObject, PBTManager, CBCentralManagerDelegate, CBPeripheralDel
         }
     }
     
+    // on discover a characteristics
     func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) -> Void {
+        if let error {
+            print(error)
+            return
+        }
         guard let characteristics = service.characteristics else {
             return
         }
@@ -172,7 +197,12 @@ class BTManager: NSObject, PBTManager, CBCentralManagerDelegate, CBPeripheralDel
         }
     }
     
+    // on discover a value
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: (any Error)?) -> Void {
+        if let error {
+            print(error)
+            return
+        }
         if characteristic.uuid == batteryLevelCharacteristicUUID && !characteristic.isNotifying {
             peripheral.delegate = self
             peripheral.setNotifyValue(true, for: characteristic)
@@ -213,5 +243,21 @@ class BTManager: NSObject, PBTManager, CBCentralManagerDelegate, CBPeripheralDel
             }
         }
         return chars
+    }
+    
+    private func disconnectAndCancel(_ peripheral: CBPeripheral?) -> Void {
+        if let peripheral {
+            if let services = peripheral.services {
+                for service in services {
+                    guard let characteristics = service.characteristics else {
+                        continue
+                    }
+                    for characteristic in characteristics {
+                        peripheral.setNotifyValue(false, for: characteristic)
+                    }
+                }
+            }
+            centralManager.cancelPeripheralConnection(peripheral)
+        }
     }
 }

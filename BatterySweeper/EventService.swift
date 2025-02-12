@@ -11,6 +11,7 @@ enum EEvent {
     case centralStateChanged(CBManagerState)
     case peripheralDiscovered(CBPeripheral)
     case connectedToPeripheral(CBPeripheral)
+    case failToConnectToPeripheral(CBPeripheral, (any Error)?)
     case disconnectedFromPeripheral(CBPeripheral)
     case characteristicDiscovered([BTCharacteristic])
 }
