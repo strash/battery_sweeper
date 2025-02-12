@@ -6,11 +6,51 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		1BCC05762D5D496100390C39 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BCC05752D5D496100390C39 /* WidgetKit.framework */; };
+		1BCC05782D5D496100390C39 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BCC05772D5D496100390C39 /* SwiftUI.framework */; };
+		1BCC05862D5D496300390C39 /* BatterySweeperWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 1BCC05732D5D496100390C39 /* BatterySweeperWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		1BCC05842D5D496300390C39 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1B71AFB92D554D6C0014647A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1BCC05722D5D496100390C39;
+			remoteInfo = BatterySweeperWidgetExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		1BCC058B2D5D496300390C39 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				1BCC05862D5D496300390C39 /* BatterySweeperWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		1B71AFC12D554D6C0014647A /* BatterySweeper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BatterySweeper.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1BCC05732D5D496100390C39 /* BatterySweeperWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BatterySweeperWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		1BCC05752D5D496100390C39 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		1BCC05772D5D496100390C39 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		1BCC058A2D5D496300390C39 /* Exceptions for "BatterySweeperWidget" folder in "BatterySweeperWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 1BCC05722D5D496100390C39 /* BatterySweeperWidgetExtension */;
+		};
 		1BEB17572D56B32E003C7300 /* Exceptions for "BatterySweeper" folder in "BatterySweeper" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -29,6 +69,14 @@
 			path = BatterySweeper;
 			sourceTree = "<group>";
 		};
+		1BCC05792D5D496100390C39 /* BatterySweeperWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				1BCC058A2D5D496300390C39 /* Exceptions for "BatterySweeperWidget" folder in "BatterySweeperWidgetExtension" target */,
+			);
+			path = BatterySweeperWidget;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -39,6 +87,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		1BCC05702D5D496100390C39 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1BCC05782D5D496100390C39 /* SwiftUI.framework in Frameworks */,
+				1BCC05762D5D496100390C39 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -46,6 +103,8 @@
 			isa = PBXGroup;
 			children = (
 				1B71AFC32D554D6C0014647A /* BatterySweeper */,
+				1BCC05792D5D496100390C39 /* BatterySweeperWidget */,
+				1BCC05742D5D496100390C39 /* Frameworks */,
 				1B71AFC22D554D6C0014647A /* Products */,
 			);
 			sourceTree = "<group>";
@@ -54,8 +113,18 @@
 			isa = PBXGroup;
 			children = (
 				1B71AFC12D554D6C0014647A /* BatterySweeper.app */,
+				1BCC05732D5D496100390C39 /* BatterySweeperWidgetExtension.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		1BCC05742D5D496100390C39 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1BCC05752D5D496100390C39 /* WidgetKit.framework */,
+				1BCC05772D5D496100390C39 /* SwiftUI.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -68,10 +137,12 @@
 				1B71AFBD2D554D6C0014647A /* Sources */,
 				1B71AFBE2D554D6C0014647A /* Frameworks */,
 				1B71AFBF2D554D6C0014647A /* Resources */,
+				1BCC058B2D5D496300390C39 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				1BCC05852D5D496300390C39 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				1B71AFC32D554D6C0014647A /* BatterySweeper */,
@@ -82,6 +153,28 @@
 			productName = BatterySweeper;
 			productReference = 1B71AFC12D554D6C0014647A /* BatterySweeper.app */;
 			productType = "com.apple.product-type.application";
+		};
+		1BCC05722D5D496100390C39 /* BatterySweeperWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1BCC05872D5D496300390C39 /* Build configuration list for PBXNativeTarget "BatterySweeperWidgetExtension" */;
+			buildPhases = (
+				1BCC056F2D5D496100390C39 /* Sources */,
+				1BCC05702D5D496100390C39 /* Frameworks */,
+				1BCC05712D5D496100390C39 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				1BCC05792D5D496100390C39 /* BatterySweeperWidget */,
+			);
+			name = BatterySweeperWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = BatterySweeperWidgetExtension;
+			productReference = 1BCC05732D5D496100390C39 /* BatterySweeperWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -94,6 +187,9 @@
 				LastUpgradeCheck = 1620;
 				TargetAttributes = {
 					1B71AFC02D554D6C0014647A = {
+						CreatedOnToolsVersion = 16.2;
+					};
+					1BCC05722D5D496100390C39 = {
 						CreatedOnToolsVersion = 16.2;
 					};
 				};
@@ -113,12 +209,20 @@
 			projectRoot = "";
 			targets = (
 				1B71AFC02D554D6C0014647A /* BatterySweeper */,
+				1BCC05722D5D496100390C39 /* BatterySweeperWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		1B71AFBF2D554D6C0014647A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1BCC05712D5D496100390C39 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -135,7 +239,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		1BCC056F2D5D496100390C39 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		1BCC05852D5D496300390C39 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1BCC05722D5D496100390C39 /* BatterySweeperWidgetExtension */;
+			targetProxy = 1BCC05842D5D496300390C39 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		1B71AFCE2D554D6D0014647A /* Debug */ = {
@@ -318,6 +437,64 @@
 			};
 			name = Release;
 		};
+		1BCC05882D5D496300390C39 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = BatterySweeperWidget/BatterySweeperWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = JR3JVRY5VP;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = BatterySweeperWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = BatterySweeperWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = ru.strash.BatterySweeper.BatterySweeperWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		1BCC05892D5D496300390C39 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = BatterySweeperWidget/BatterySweeperWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = JR3JVRY5VP;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = BatterySweeperWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = BatterySweeperWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = ru.strash.BatterySweeper.BatterySweeperWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -335,6 +512,15 @@
 			buildConfigurations = (
 				1B71AFD12D554D6D0014647A /* Debug */,
 				1B71AFD22D554D6D0014647A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1BCC05872D5D496300390C39 /* Build configuration list for PBXNativeTarget "BatterySweeperWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1BCC05882D5D496300390C39 /* Debug */,
+				1BCC05892D5D496300390C39 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
