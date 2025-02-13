@@ -114,6 +114,13 @@ class BTManager: NSObject, PBTManager, CBCentralManagerDelegate, CBPeripheralDel
         )
     }
     
+    func tryToReconnenct() -> Void {
+        guard let activePeripheral else {
+            return
+        }
+        connectToPeripheral(with: activePeripheral.identifier)
+    }
+    
     // MARK: bt shits
     
     // on update state
@@ -123,15 +130,16 @@ class BTManager: NSObject, PBTManager, CBCentralManagerDelegate, CBPeripheralDel
         case .poweredOn:
             break
         default:
-            if let activePeripheral {
-                disconnectAndCancel(activePeripheral)
-                self.activePeripheral = nil
-                subject?.notify(.disconnectedFromPeripheral(activePeripheral))
-            }
-            for peripheral in availablePeripherals {
-                disconnectAndCancel(peripheral)
-            }
-            availablePeripherals.removeAll()
+            break
+//            if let activePeripheral {
+//                disconnectAndCancel(activePeripheral)
+//                self.activePeripheral = nil
+//                subject?.notify(.disconnectedFromPeripheral(activePeripheral))
+//            }
+//            for peripheral in availablePeripherals {
+//                disconnectAndCancel(peripheral)
+//            }
+//            availablePeripherals.removeAll()
         }
     }
     
@@ -154,7 +162,6 @@ class BTManager: NSObject, PBTManager, CBCentralManagerDelegate, CBPeripheralDel
     func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: (any Error)?) {
         if let error {
             print(error)
-            return
         }
         subject?.notify(.failToConnectToPeripheral(peripheral, error))
     }
@@ -163,7 +170,6 @@ class BTManager: NSObject, PBTManager, CBCentralManagerDelegate, CBPeripheralDel
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: (any Error)?) {
         if let error {
             print(error)
-            return
         }
         subject?.notify(.disconnectedFromPeripheral(peripheral))
     }
@@ -172,7 +178,6 @@ class BTManager: NSObject, PBTManager, CBCentralManagerDelegate, CBPeripheralDel
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, timestamp: CFAbsoluteTime, isReconnecting: Bool, error: (any Error)?) {
         if let error {
             print(error)
-            return
         }
         if isReconnecting {
             subject?.notify(.connectedToPeripheral(peripheral))
@@ -194,7 +199,6 @@ class BTManager: NSObject, PBTManager, CBCentralManagerDelegate, CBPeripheralDel
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: (any Error)?) -> Void {
         if let error {
             print(error)
-            return
         }
         guard let services = peripheral.services else {
             return
@@ -205,9 +209,7 @@ class BTManager: NSObject, PBTManager, CBCentralManagerDelegate, CBPeripheralDel
                 batteryLevelCharacteristicUUID,
                 modelNumberStringCharacteristicUUID,
                 manufacturerNameStringCharacteristicUUID,
-            ],
-               for: service
-            )
+            ], for: service)
         }
     }
     
@@ -215,7 +217,6 @@ class BTManager: NSObject, PBTManager, CBCentralManagerDelegate, CBPeripheralDel
     func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: (any Error)?) -> Void {
         if let error {
             print(error)
-            return
         }
         guard let characteristics = service.characteristics else {
             return
@@ -230,7 +231,6 @@ class BTManager: NSObject, PBTManager, CBCentralManagerDelegate, CBPeripheralDel
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: (any Error)?) -> Void {
         if let error {
             print(error)
-            return
         }
         if characteristic.uuid == batteryLevelCharacteristicUUID && !characteristic.isNotifying {
             peripheral.delegate = self

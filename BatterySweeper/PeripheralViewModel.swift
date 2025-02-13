@@ -13,6 +13,7 @@ protocol PBTManager {
     func scanPeripherals() -> Void
     func stopScan() -> Void
     func connectToPeripheral(with uuid: UUID) -> Void
+    func tryToReconnenct() -> Void
 }
 
 @Observable
@@ -71,9 +72,9 @@ class PeripheralViewModel: PObserver, Identifiable, Equatable {
             switch state {
             case .poweredOn:
                 retrieveConnectedPeripherals()
+                btManager.tryToReconnenct()
                 error = nil
             case _:
-                // TODO: maybe show errors
                 peripherals.removeAll()
                 activePeripheral = nil
             }
@@ -99,7 +100,7 @@ class PeripheralViewModel: PObserver, Identifiable, Equatable {
         case .disconnectedFromPeripheral(let cbPeripheral):
             if let activePeripheral, activePeripheral.id == cbPeripheral.identifier {
                 self.activePeripheral = nil
-                activeCharacteristics.removeAll()
+                activeCharacteristics = []
             }
             error = nil
         
