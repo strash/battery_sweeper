@@ -7,68 +7,21 @@
 
 import CoreBluetooth
 
+enum EBTCharacteristic: Equatable {
+    case batteryLevel(Int)
+    case manufacturerName(String)
+    case modelNumber(String)
+}
+
 struct BTCharacteristic: Identifiable {
-    enum EBTCharacteristic {
-        case batteryLevel(Int)
-        case manufacturerName(String)
-        case modelNumber(String)
-    }
-    
     var id: UUID
     var value: EBTCharacteristic
 }
 
-class BTManager: NSObject, PBTManager, CBCentralManagerDelegate, CBPeripheralDelegate {
-    private let BT_BATTERY_SERVICE_UUID = "0x180F"
-    private let BT_DEVICE_INFORMATION_SERVICE_UUID = "0x180A"
-    private let BT_BATTERY_LEVEL_CHARACTERISTIC_UUID = "0x2A19"
-    private let BT_MODEL_NUMBER_STRING_CHARACTERISTIC_UUID = "0x2A24"
-    private let BT_MANUFACTURER_NAME_STRING_CHARACTERISTIC_UUID = "0x2A29"
-
-    private var centralManager: CBCentralManager!
-    private var activePeripheral: CBPeripheral? = nil
-    private var availablePeripherals: [CBPeripheral] = []
-    
-    private var subject: Subject? = nil
-
-    init(with subject: Subject) {
-        super.init()
-        centralManager = CBCentralManager(delegate: self, queue: nil)
-        self.subject = subject
+class BTManagerImpl: BaseBTManager, PBTManager {
+    override init(with subject: Subject) {
+        super.init(with: subject)
     }
-    
-    deinit {
-        if let activePeripheral {
-            disconnectAndCancel(activePeripheral)
-            self.activePeripheral = nil
-        }
-        for peripheral in availablePeripherals {
-            disconnectAndCancel(peripheral)
-        }
-        availablePeripherals.removeAll()
-    }
-    
-    private var batteryServiceUUID: CBUUID {
-        CBUUID(string: BT_BATTERY_SERVICE_UUID)
-    }
-    
-    private var deviceInformationServiceUUID: CBUUID {
-        CBUUID(string: BT_DEVICE_INFORMATION_SERVICE_UUID)
-    }
-    
-    private var batteryLevelCharacteristicUUID: CBUUID {
-        CBUUID(string: BT_BATTERY_LEVEL_CHARACTERISTIC_UUID)
-    }
-    
-    private var modelNumberStringCharacteristicUUID: CBUUID {
-        CBUUID(string: BT_MODEL_NUMBER_STRING_CHARACTERISTIC_UUID)
-    }
-    
-    private var manufacturerNameStringCharacteristicUUID: CBUUID {
-        CBUUID(string: BT_MANUFACTURER_NAME_STRING_CHARACTERISTIC_UUID)
-    }
-
-    // MARK: protocol
     
     func retrieveConnectedPeripherals() -> Void {
         guard centralManager.state == .poweredOn else {
@@ -77,8 +30,9 @@ class BTManager: NSObject, PBTManager, CBCentralManagerDelegate, CBPeripheralDel
         let peripherals = centralManager.retrieveConnectedPeripherals(
             withServices: [batteryServiceUUID]
         )
+        availablePeripherals.removeAll()
         for peripheral in peripherals {
-            availablePeripherals.append(peripheral)
+            availablePeripherals.insert(peripheral)
             subject?.notify(.peripheralDiscovered(peripheral))
         }
     }
@@ -120,8 +74,57 @@ class BTManager: NSObject, PBTManager, CBCentralManagerDelegate, CBPeripheralDel
         }
         connectToPeripheral(with: activePeripheral.identifier)
     }
+}
+
+class BaseBTManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
+    private let BT_BATTERY_SERVICE_UUID = "0x180F"
+    private let BT_DEVICE_INFORMATION_SERVICE_UUID = "0x180A"
+    private let BT_BATTERY_LEVEL_CHARACTERISTIC_UUID = "0x2A19"
+    private let BT_MODEL_NUMBER_STRING_CHARACTERISTIC_UUID = "0x2A24"
+    private let BT_MANUFACTURER_NAME_STRING_CHARACTERISTIC_UUID = "0x2A29"
+
+    fileprivate var centralManager: CBCentralManager!
+    fileprivate var activePeripheral: CBPeripheral? = nil
+    fileprivate var availablePeripherals: Set<CBPeripheral> = []
     
-    // MARK: bt shits
+    fileprivate var subject: Subject? = nil
+
+    init(with subject: Subject) {
+        super.init()
+        centralManager = CBCentralManager(delegate: self, queue: nil)
+        self.subject = subject
+    }
+    
+    deinit {
+        if let activePeripheral {
+            disconnectAndCancel(activePeripheral)
+            self.activePeripheral = nil
+        }
+        for peripheral in availablePeripherals {
+            disconnectAndCancel(peripheral)
+        }
+        availablePeripherals.removeAll()
+    }
+    
+    fileprivate var batteryServiceUUID: CBUUID {
+        CBUUID(string: BT_BATTERY_SERVICE_UUID)
+    }
+    
+    fileprivate var deviceInformationServiceUUID: CBUUID {
+        CBUUID(string: BT_DEVICE_INFORMATION_SERVICE_UUID)
+    }
+    
+    fileprivate var batteryLevelCharacteristicUUID: CBUUID {
+        CBUUID(string: BT_BATTERY_LEVEL_CHARACTERISTIC_UUID)
+    }
+    
+    fileprivate var modelNumberStringCharacteristicUUID: CBUUID {
+        CBUUID(string: BT_MODEL_NUMBER_STRING_CHARACTERISTIC_UUID)
+    }
+    
+    fileprivate var manufacturerNameStringCharacteristicUUID: CBUUID {
+        CBUUID(string: BT_MANUFACTURER_NAME_STRING_CHARACTERISTIC_UUID)
+    }
     
     // on update state
     func centralManagerDidUpdateState(_ central: CBCentralManager) -> Void {
@@ -145,7 +148,7 @@ class BTManager: NSObject, PBTManager, CBCentralManagerDelegate, CBPeripheralDel
     
     // on discover a peripheral
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) -> Void {
-        availablePeripherals.append(peripheral)
+        availablePeripherals.insert(peripheral)
         peripheral.delegate = self
         subject?.notify(.peripheralDiscovered(peripheral))
     }
@@ -187,7 +190,8 @@ class BTManager: NSObject, PBTManager, CBCentralManagerDelegate, CBPeripheralDel
     func peripheralDidUpdateName(_ peripheral: CBPeripheral) {
         let index = availablePeripherals.firstIndex(where: { $0.identifier == peripheral.identifier })
         if let index {
-            availablePeripherals[index] = peripheral
+            availablePeripherals.remove(at: index)
+            availablePeripherals.insert(peripheral)
         }
         if let activePeripheral, activePeripheral.identifier == peripheral.identifier {
             self.activePeripheral = peripheral
@@ -241,7 +245,7 @@ class BTManager: NSObject, PBTManager, CBCentralManagerDelegate, CBPeripheralDel
         )
     }
     
-    private func getCharacteristics(from characteristic: CBCharacteristic, for id: UUID) -> [BTCharacteristic] {
+    fileprivate func getCharacteristics(from characteristic: CBCharacteristic, for id: UUID) -> [BTCharacteristic] {
         var chars: [BTCharacteristic] = []
         if let services = characteristic.service?.peripheral?.services {
             for s in services {
@@ -274,7 +278,7 @@ class BTManager: NSObject, PBTManager, CBCentralManagerDelegate, CBPeripheralDel
         return chars
     }
     
-    private func disconnectAndCancel(_ peripheral: CBPeripheral?) -> Void {
+    fileprivate func disconnectAndCancel(_ peripheral: CBPeripheral?) -> Void {
         if let peripheral {
             if let services = peripheral.services {
                 for service in services {

@@ -92,7 +92,7 @@ struct MainView: View {
             return true
         }.map {
             switch $0.characteristic {
-            case .manufacturer(let value), .model(let value):
+            case .manufacturerName(let value), .modelNumber(let value):
                 return value
             default:
                 return ""

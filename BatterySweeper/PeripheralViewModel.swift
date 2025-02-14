@@ -100,7 +100,7 @@ class PeripheralViewModel: PObserver, Identifiable, Equatable {
         case .disconnectedFromPeripheral(let cbPeripheral):
             if let activePeripheral, activePeripheral.id == cbPeripheral.identifier {
                 self.activePeripheral = nil
-                activeCharacteristics = []
+                activeCharacteristics.removeAll()
             }
             error = nil
         
@@ -130,7 +130,7 @@ class PeripheralViewModel: PObserver, Identifiable, Equatable {
 #if DEBUG
 extension PeripheralViewModel {
     convenience init() {
-        self.init(btManager: BTManager(with: .init()), subject: .init())
+        self.init(btManager: BTManagerImpl(with: .init()), subject: .init())
         centralState = .poweredOn
         peripherals = [
             .init(id: .init(), name: "Sweep Test"),
@@ -140,8 +140,8 @@ extension PeripheralViewModel {
         activeCharacteristics = [
             .init(characteristic: .batteryLevel(54)),
             .init(characteristic: .batteryLevel(25)),
-            .init(characteristic: .manufacturer("ZMK project")),
-            .init(characteristic: .model("Cradio")),
+            .init(characteristic: .manufacturerName("ZMK project")),
+            .init(characteristic: .modelNumber("Cradio")),
         ]
     }
 }

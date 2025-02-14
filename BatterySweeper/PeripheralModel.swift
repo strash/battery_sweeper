@@ -8,16 +8,10 @@
 import CoreBluetooth
 
 struct CharacteristicModel: Identifiable, Equatable {
-    enum ECharacteristic: Equatable {
-        case batteryLevel(Int)
-        case manufacturer(String)
-        case model(String)
-    }
-
     let id: UUID = .init()
-    var characteristic: ECharacteristic
+    var characteristic: EBTCharacteristic
     
-    init(characteristic: ECharacteristic) {
+    init(characteristic: EBTCharacteristic) {
         self.characteristic = characteristic
     }
     
@@ -26,9 +20,9 @@ struct CharacteristicModel: Identifiable, Equatable {
         case .batteryLevel(let value):
             self.characteristic = .batteryLevel(value)
         case .manufacturerName(let value):
-            self.characteristic = .manufacturer(value)
+            self.characteristic = .manufacturerName(value)
         case .modelNumber(let value):
-            self.characteristic = .model(value)
+            self.characteristic = .modelNumber(value)
         }
     }
     
