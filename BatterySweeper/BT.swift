@@ -19,6 +19,8 @@ struct BTCharacteristic: Identifiable {
 }
 
 class BTManagerImpl: BaseBTManager, PBTManager {
+    private var timer: Timer?
+    
     override init(with subject: Subject) {
         super.init(with: subject)
     }
@@ -72,7 +74,17 @@ class BTManagerImpl: BaseBTManager, PBTManager {
         guard let activePeripheral else {
             return
         }
-        connectToPeripheral(with: activePeripheral.identifier)
+        timer = Timer(timeInterval: 5, repeats: true) { t in
+            self.connectToPeripheral(with: activePeripheral.identifier)
+        }
+        RunLoop.main.add(timer!, forMode: .common)
+    }
+    
+    override func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) -> Void {
+        if let timer, timer.isValid {
+            timer.invalidate()
+        }
+        super.centralManager(central, didConnect: peripheral)
     }
 }
 

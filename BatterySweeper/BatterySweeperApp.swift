@@ -14,7 +14,7 @@ struct BatterySweeperApp: App {
     @State private var peripheralViewModel: PeripheralViewModel
     
     init() {
-        btManager = BTManager.init(with: subject)
+        btManager = BTManagerImpl.init(with: subject)
         peripheralViewModel = .init(btManager: btManager, subject: subject)
     }
     
