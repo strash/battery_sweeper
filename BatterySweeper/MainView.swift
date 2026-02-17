@@ -14,7 +14,7 @@ struct MainView: View {
         Group {
             if let peripheral = viewModel.activePeripheral {
                 // -> active peripheral
-                VStack(alignment: .leading, spacing: 3.0) {
+                VStack(alignment: .center, spacing: 3.0) {
                     // -> name
                     Text(peripheral.name)
                         .font(.title)
@@ -26,16 +26,16 @@ struct MainView: View {
                         .padding(.bottom)
 
                     // -> battery levels
-                    Text(batteryLevel)
-                        .fontWeight(.medium)
+                    BatteryLevelView()
                 }
             } else {
                 // -> empty state
-                if viewModel.centralState == .poweredOn && !viewModel.peripherals.isEmpty {
-                    WelcomeEmptyStateView()
-                } else if viewModel.centralState != .poweredOn {
+                switch (viewModel.centralState == .poweredOn) {
+                case true where !viewModel.peripherals.isEmpty:
+                   WelcomeEmptyStateView()
+                case false:
                     PowerOffEmptyStateView()
-                } else {
+                default:
                     RefreshPeripheralsEmptyStateView()
                 }
             }
@@ -60,6 +60,7 @@ struct MainView: View {
                     Image(systemName: "antenna.radiowaves.left.and.right")
                         .frame(minWidth: 30, alignment: .center)
                         .symbolEffect(.variableColor, isActive: viewModel.isScanning)
+                        .accessibilityLabel(Text(viewModel.isScanning ? "Stop" : "Scan for devices"))
                 }
                 .help(viewModel.isScanning ? "Stop" : "Scan for devices")
                 .disabled(viewModel.centralState != .poweredOn)
@@ -67,23 +68,6 @@ struct MainView: View {
         }
         .padding()
         .frame(minWidth: 450.0, idealHeight: 350.0)
-    }
-    
-    private var batteryLevel: String {
-        let chars: [Int] = viewModel.activeCharacteristics.filter {
-            if case .batteryLevel(_) = $0.characteristic { return true }
-            return false
-        }.map {
-            if case .batteryLevel(let value) = $0.characteristic { return value }
-            return 0
-        }
-        if chars.count == 2 {
-            return chars.enumerated().reduce("", { prev, curr in
-                if curr.0 == 0 { return "L: \(curr.1)%" }
-                return "\(prev) R: \(curr.1)%"
-            })
-        }
-        return chars.map { "\($0)%" }.joined(separator: " ")
     }
     
     private var modelName: String {

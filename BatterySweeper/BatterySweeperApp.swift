@@ -34,6 +34,7 @@ struct BatterySweeperApp: App {
         Window("Battery Sweeper", id: "main") {
             MainView()
                 .environment(peripheralViewModel)
+                .frame(minWidth: 200, minHeight: 100)
         }
         .windowResizability(.contentMinSize)
         .windowToolbarLabelStyle(fixed: .automatic)

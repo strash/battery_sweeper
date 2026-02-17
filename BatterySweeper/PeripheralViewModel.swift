@@ -51,14 +51,14 @@ class PeripheralViewModel: PObserver, Identifiable, Equatable {
     }
     
     func scanPeripherals() -> Void {
+        isScanning = true
         btManager.retrieveConnectedPeripherals()
         btManager.scanPeripherals()
-        isScanning = true
     }
     
     func stopScan() -> Void {
-        btManager.stopScan()
         isScanning = false
+        btManager.stopScan()
     }
     
     func connectToPeripheral(with id: UUID) -> Void {
