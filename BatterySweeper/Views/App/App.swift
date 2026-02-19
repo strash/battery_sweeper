@@ -44,6 +44,9 @@ struct BatterySweeperApp: App {
                 .environment(viewModel)
                 .environment(model)
                 .frame(minWidth: 200, minHeight: 100)
+                .onAppear {
+                    NSApplication.shared.activate(ignoringOtherApps: true)
+                }
         }
         .windowResizability(.contentMinSize)
         .windowToolbarLabelStyle(fixed: .automatic)
