@@ -8,11 +8,26 @@
 import SwiftUI
 
 struct MainView: View {
-    @Environment(PeripheralViewModel.self) private var viewModel
+    @Environment(AppViewModel.self) private var viewModel
+    @Environment(AppModel.self) private var model
     
+    private var modelName: String {
+        model.activeCharacteristics.filter {
+            if case .batteryLevel(_) = $0.characteristic { return false }
+            return true
+        }.map {
+            switch $0.characteristic {
+            case .manufacturerName(let value), .modelNumber(let value):
+                return value
+            default:
+                return ""
+            }
+        }.joined(separator: " • ")
+    }
+
     var body: some View {
         Group {
-            if let peripheral = viewModel.activePeripheral {
+            if let peripheral = model.activePeripheral {
                 // -> active peripheral
                 VStack(alignment: .center, spacing: 3.0) {
                     // -> name
@@ -30,9 +45,9 @@ struct MainView: View {
                 }
             } else {
                 // -> empty state
-                switch (viewModel.centralState == .poweredOn) {
-                case true where !viewModel.peripherals.isEmpty:
-                   WelcomeEmptyStateView()
+                switch (model.centralState == .poweredOn) {
+                case true where !model.peripherals.isEmpty:
+                    WelcomeEmptyStateView()
                 case false:
                     PowerOffEmptyStateView()
                 default:
@@ -44,51 +59,38 @@ struct MainView: View {
 
         .toolbar {
             ToolbarItemGroup {
-                // -> peripherals
-                PeripheralPickerView("Devices", maxWidth: 100, help: "Devices")
-                    .disabled(viewModel.centralState != .poweredOn)
+                // -> peripheral select
+                if model.activePeripheral != nil {
+                    PeripheralPickerView("Devices", maxWidth: 100, help: "Devices")
+                        .disabled(model.centralState != .poweredOn)
+                }
 
-                // -> scan
+                // -> button scan
                 Button {
-                    if viewModel.isScanning {
+                    if model.isScanning {
                         viewModel.scanPeripherals()
                     } else {
                         viewModel.stopScan()
                     }
-                    viewModel.isScanning.toggle()
+                    model.isScanning.toggle()
                 } label: {
                     Image(systemName: "antenna.radiowaves.left.and.right")
                         .frame(minWidth: 30, alignment: .center)
-                        .symbolEffect(.variableColor, isActive: viewModel.isScanning)
-                        .accessibilityLabel(Text(viewModel.isScanning ? "Stop" : "Scan for devices"))
+                        .symbolEffect(.variableColor, isActive: model.isScanning)
+                        .accessibilityLabel(Text(model.isScanning ? "Stop" : "Scan for devices"))
                 }
-                .help(viewModel.isScanning ? "Stop" : "Scan for devices")
-                .disabled(viewModel.centralState != .poweredOn)
+                .help(model.isScanning ? "Stop" : "Scan for devices")
+                .disabled(model.centralState != .poweredOn)
             }
         }
         .padding()
         .frame(minWidth: 450.0, idealHeight: 350.0)
     }
-    
-    private var modelName: String {
-        viewModel.activeCharacteristics.filter {
-            if case .batteryLevel(_) = $0.characteristic { return false }
-            return true
-        }.map {
-            switch $0.characteristic {
-            case .manufacturerName(let value), .modelNumber(let value):
-                return value
-            default:
-                return ""
-            }
-        }.joined(separator: " • ")
-        
-    }
 }
 
 #if DEBUG
 #Preview {
-    @Previewable @State var viewModel = PeripheralViewModel()
+    @Previewable @State var viewModel = AppViewModel()
     
     MainView()
         .environment(viewModel)

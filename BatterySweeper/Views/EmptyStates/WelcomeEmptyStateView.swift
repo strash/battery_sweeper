@@ -16,7 +16,7 @@ struct WelcomeEmptyStateView: View {
                 description: Text("Please select a device\nfrom the menu to continue.")
             )
             
-            // -> peripherals
+            // -> peripheral picker
             PeripheralPickerView("", maxWidth: 200, help: "Devices")
         }
     }

@@ -1,11 +1,11 @@
 //
-//  PeripheralModel.swift
+//  Characteristic.swift
 //  BatterySweeper
 //
-//  Created by Dmitry Poyarkov on 2/9/25.
+//  Created by Dmitry Poyarkov on 2/18/26.
 //
 
-import CoreBluetooth
+import Foundation
 
 struct CharacteristicModel: Identifiable, Equatable {
     let id: UUID = .init()
@@ -15,7 +15,7 @@ struct CharacteristicModel: Identifiable, Equatable {
         self.characteristic = characteristic
     }
     
-    init(from characteristic: BTCharacteristic) {
+    init(from characteristic: BTCharacteristicDto) {
         switch characteristic.value {
         case .batteryLevel(let value):
             self.characteristic = .batteryLevel(value)
@@ -31,24 +31,3 @@ struct CharacteristicModel: Identifiable, Equatable {
     }
 }
 
-struct PeripheralModel: Identifiable, Equatable, Hashable {
-    var id: UUID
-    var name: String
-    
-    init(id: UUID, name: String) {
-        self.id = id
-        self.name = name
-    }
-    
-    init(from peripheral: CBPeripheral) {
-        self.init(id: peripheral.identifier, name: peripheral.name ?? "--")
-    }
-    
-    func copyWith(name: String? = nil) -> PeripheralModel {
-        .init(id: id, name: name ?? self.name)
-    }
-    
-    static func ==(lhs: PeripheralModel, rhs: PeripheralModel) -> Bool {
-        lhs.id == rhs.id && lhs.name == rhs.name
-    }
-}

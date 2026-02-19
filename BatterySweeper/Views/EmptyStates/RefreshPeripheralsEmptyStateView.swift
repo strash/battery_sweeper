@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct RefreshPeripheralsEmptyStateView: View {
-    @Environment(PeripheralViewModel.self) private var viewModel
+    @Environment(AppViewModel.self) private var viewModel
     
     var body: some View {
         VStack {

@@ -13,7 +13,8 @@ struct MenuBarView: View {
     var body: some View {
         VStack {
             Button("Open Battery Sweeper") {
-                openWindow(id: "main")
+                NSApplication.shared.activate(ignoringOtherApps: true)
+                openWindow(id: kMainWindowID)
             }
 
             Divider()

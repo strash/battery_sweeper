@@ -8,8 +8,6 @@
 import SwiftUI
 
 struct PowerOffEmptyStateView: View {
-    @Environment(PeripheralViewModel.self) private var viewModel
-    
     var body: some View {
         ContentUnavailableView(
             "Disconnected",

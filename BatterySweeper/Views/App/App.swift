@@ -1,5 +1,5 @@
 //
-//  BatterySweeperApp.swift
+//  App.swift
 //  BatterySweeper
 //
 //  Created by Dmitry Poyarkov on 2/7/25.
@@ -7,21 +7,29 @@
 
 import SwiftUI
 
+let kMainWindowID: String = "main_window"
+
 @main
 struct BatterySweeperApp: App {
-    private let subject: Subject = .init()
-    private let btManager: PBTManager
-    @State private var peripheralViewModel: PeripheralViewModel
+    private let subject: EventService = .init()
+    private var viewModel: AppViewModel
+    @State private var model: AppModel
+    
     
     init() {
-        btManager = BTManagerImpl.init(with: subject)
-        peripheralViewModel = .init(btManager: btManager, subject: subject)
+        let model: AppModel = .init()
+        self.viewModel = .init(
+            btManager: BTService.init(with: subject),
+            subject: subject,
+            model: model
+        )
+        self.model = model
     }
     
     private var icon: String {
         get {
-            if peripheralViewModel.centralState == .poweredOn {
-                if peripheralViewModel.activePeripheral != nil {
+            if model.centralState == .poweredOn {
+                if model.activePeripheral != nil {
                     return "minus.plus.batteryblock.fill"
                 }
                 return "minus.plus.batteryblock"
@@ -31,9 +39,10 @@ struct BatterySweeperApp: App {
     }
     
     var body: some Scene {
-        Window("Battery Sweeper", id: "main") {
+        Window("Battery Sweeper", id: kMainWindowID) {
             MainView()
-                .environment(peripheralViewModel)
+                .environment(viewModel)
+                .environment(model)
                 .frame(minWidth: 200, minHeight: 100)
         }
         .windowResizability(.contentMinSize)
