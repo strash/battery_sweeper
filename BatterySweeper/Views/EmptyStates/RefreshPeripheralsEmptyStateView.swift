@@ -17,7 +17,8 @@ struct RefreshPeripheralsEmptyStateView: View {
                 systemImage: "arrow.clockwise",
                 description: Text("Please make sure your devices are powered on and within range. Click 'Refresh' to search for devices.")
             )
-            
+            .fontDesign(.rounded)
+
             Button("Refresh") {
                 viewModel.retrieveConnectedPeripherals()
             }

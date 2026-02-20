@@ -45,7 +45,9 @@ struct BatterySweeperApp: App {
                 .environment(model)
                 .frame(minWidth: 200, minHeight: 100)
                 .onAppear {
+#if !DEBUG
                     NSApplication.shared.activate(ignoringOtherApps: true)
+#endif
                 }
         }
         .windowResizability(.contentMinSize)

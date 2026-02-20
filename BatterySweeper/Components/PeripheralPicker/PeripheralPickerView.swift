@@ -40,11 +40,8 @@ struct PeripheralPickerView: View {
             }
             .pickerStyle(.menu)
             .frame(maxWidth: maxWidth)
+            .fontDesign(.rounded)
             .help(help)
         }
     }
 }
-
-//#Preview {
-//    PeripheralPickerView("Label", maxWidth: 200, help: "Devices")
-//}

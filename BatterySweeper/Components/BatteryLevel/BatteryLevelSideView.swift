@@ -7,12 +7,6 @@
 
 import SwiftUI
 
-enum EBatteryLevelSide {
-    case left
-    case right
-    case center
-}
-
 struct BatteryLevelSideView: View {
     let side: EBatteryLevelSide
     let level: Int
@@ -24,19 +18,14 @@ struct BatteryLevelSideView: View {
     
     var body: some View {
         HStack(spacing: 3.0) {
-            let iconSide = switch(side) {
-            case .center: "m"
-            case .left: "l"
-            case .right: "r"
-            }
+            // -> icon
+            Image(systemName: side.sideIcon)
+                .foregroundStyle(.secondary)
             
-            if side != .center {
-                Image(systemName: "\(iconSide).circle.fill")
-                    .foregroundStyle(.secondary)
-            }
-            
+            // -> level
             Text("\(level)%")
                 .fontWeight(.medium)
         }
+        .fontDesign(.rounded)
     }
 }

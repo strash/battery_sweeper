@@ -15,6 +15,7 @@ struct WelcomeEmptyStateView: View {
                 systemImage: "keyboard",
                 description: Text("Please select a device\nfrom the menu to continue.")
             )
+            .fontDesign(.rounded)
             
             // -> peripheral picker
             PeripheralPickerView("", maxWidth: 200, help: "Devices")

@@ -11,45 +11,29 @@ struct BatteryLevelView: View {
     @Environment(AppModel.self) private var model
     
     var body: some View {
-        let batteryLevels = self.batteryLevels
+        let batteryLevels = model.activeCharacteristics.batteryLevels
         let totalLevel = max(0, batteryLevels.reduce(0, { $0 + $1 }) / max(1, batteryLevels.count))
-        
-        let iconPercent = switch (totalLevel) {
-        case 76...100: 100
-        case 51...75: 75
-        case 26...50: 50
-        case 5...26: 25
-        default: 0
-        }
+        let (percent, icon) = EBatteryLevelSide.levelIcon(from: totalLevel)
         
         HStack(spacing: 10.0) {
             // -> icon battery
-            Image(systemName: "battery.\(iconPercent)percent")
+            Image(systemName: icon)
                 .font(.title3)
-                .symbolRenderingMode(iconPercent > 0 ? .palette : .monochrome)
-                .foregroundStyle(iconPercent > 25 ? .green : .red, .secondary)
-            
+                .symbolRenderingMode(percent > 0 ? .palette : .monochrome)
+                .foregroundStyle(percent > 25 ? .green : .red, .secondary)
+
             // -> levels
             if batteryLevels.count == 1 {
-                BatteryLevelSideView(.center, level: 10)
+                BatteryLevelSideView(.center, level: batteryLevels.first!)
             } else {
                 HStack(spacing: 10.0) {
                     ForEach(batteryLevels.indices, id: \.self) { levelIdx in
                         let level = batteryLevels[levelIdx]
-                        BatteryLevelSideView(levelIdx == 0 ? .left : .right, level: level)
+                        let side = EBatteryLevelSide.from(index: levelIdx)
+                        BatteryLevelSideView(side, level: level)
                     }
                 }
             }
-        }
-    }
-    
-    private var batteryLevels: [Int] {
-        return model.activeCharacteristics.filter {
-            if case .batteryLevel(_) = $0.characteristic { return true }
-            return false
-        }.map {
-            if case .batteryLevel(let value) = $0.characteristic { return value }
-            return 0
         }
     }
 }

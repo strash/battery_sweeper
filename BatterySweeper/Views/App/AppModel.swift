@@ -21,3 +21,15 @@ class AppModel {
     
     var error: (any Error)? = nil
 }
+
+#if DEBUG
+extension AppModel {
+    convenience init(_ state: CBManagerState, peripherals: [PeripheralModel], activePeripheral: PeripheralModel, activeCharacteristics: [CharacteristicModel]) {
+        self.init()
+        self.centralState = state
+        self.peripherals = peripherals
+        self.activePeripheral = activePeripheral
+        self.activeCharacteristics = activeCharacteristics
+    }
+}
+#endif

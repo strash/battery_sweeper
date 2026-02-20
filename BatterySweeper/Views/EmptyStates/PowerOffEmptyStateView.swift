@@ -14,6 +14,7 @@ struct PowerOffEmptyStateView: View {
             systemImage: "antenna.radiowaves.left.and.right.slash",
             description: Text("Please turn bluetooth on.")
         )
+        .fontDesign(.rounded)
     }
 }
 

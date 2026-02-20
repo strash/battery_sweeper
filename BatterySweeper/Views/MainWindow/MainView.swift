@@ -11,41 +11,29 @@ struct MainView: View {
     @Environment(AppViewModel.self) private var viewModel
     @Environment(AppModel.self) private var model
     
-    private var modelName: String {
-        model.activeCharacteristics.filter {
-            if case .batteryLevel(_) = $0.characteristic { return false }
-            return true
-        }.map {
-            switch $0.characteristic {
-            case .manufacturerName(let value), .modelNumber(let value):
-                return value
-            default:
-                return ""
-            }
-        }.joined(separator: " • ")
-    }
-
     var body: some View {
         Group {
             if let peripheral = model.activePeripheral {
                 // -> active peripheral
-                VStack(alignment: .center, spacing: 3.0) {
+                VStack(alignment: .center, spacing: 5.0) {
                     // -> name
                     Text(peripheral.name)
-                        .font(.title)
+                        .font(.largeTitle)
                         .fontWeight(.medium)
+                        .fontDesign(.rounded)
                     
                     // -> model and manufacturer name
-                    Text(modelName)
+                    Text(model.activeCharacteristics.modelName)
                         .foregroundStyle(.secondary)
                         .padding(.bottom)
+                        .fontDesign(.rounded)
 
                     // -> battery levels
                     BatteryLevelView()
                 }
             } else {
                 // -> empty state
-                switch (model.centralState == .poweredOn) {
+                switch model.centralState == .poweredOn {
                 case true where !model.peripherals.isEmpty:
                     WelcomeEmptyStateView()
                 case false:
@@ -61,7 +49,7 @@ struct MainView: View {
             ToolbarItemGroup {
                 // -> peripheral select
                 if model.activePeripheral != nil {
-                    PeripheralPickerView("Devices", maxWidth: 100, help: "Devices")
+                    PeripheralPickerView("Devices", maxWidth: 130, help: "Devices")
                         .disabled(model.centralState != .poweredOn)
                 }
 
@@ -90,9 +78,21 @@ struct MainView: View {
 
 #if DEBUG
 #Preview {
+    @Previewable @State var model = AppModel(
+        .poweredOn,
+        peripherals: [.init(id: .init(), name: "Sweep Test")],
+        activePeripheral: .init(id: .init(), name: "Sweep Test"),
+        activeCharacteristics: [
+            .init(characteristic: .batteryLevel(54)),
+            .init(characteristic: .batteryLevel(25)),
+            .init(characteristic: .manufacturerName("ZMK project")),
+            .init(characteristic: .modelNumber("Cradio")),
+        ]
+    )
     @Previewable @State var viewModel = AppViewModel()
     
     MainView()
         .environment(viewModel)
+        .environment(model)
 }
 #endif

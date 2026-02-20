@@ -31,3 +31,30 @@ struct CharacteristicModel: Identifiable, Equatable {
     }
 }
 
+extension [CharacteristicModel] {
+    /// Filter battery levels
+    var batteryLevels: [Int] {
+        return self.filter {
+            if case .batteryLevel(_) = $0.characteristic { return true }
+            return false
+        }.map {
+            if case .batteryLevel(let value) = $0.characteristic { return value }
+            return 0
+        }
+    }
+    
+    /// Model name
+    var modelName: String {
+        self.filter {
+            if case .batteryLevel(_) = $0.characteristic { return false }
+            return true
+        }.map {
+            switch $0.characteristic {
+            case .manufacturerName(let value), .modelNumber(let value):
+                return value
+            default:
+                return ""
+            }
+        }.joined(separator: " • ")
+    }
+}
