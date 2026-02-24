@@ -14,15 +14,14 @@ class AppModel {
     var centralState: CBManagerState = .unknown
     var peripherals: [PeripheralModel] = []
     
-    var activePeripheralID: UUID? = nil
-    
-    var activePeripheral: PeripheralModel? {
-        peripheral(by: activePeripheralID)
-    }
-    
     var isScanning: Bool = false
     
     var error: (any Error)? = nil
+
+    var activePeripheralID: UUID? = nil
+    var activePeripheral: PeripheralModel? {
+        peripheral(by: activePeripheralID)
+    }
     
     func peripheral(by id: UUID?) -> PeripheralModel? {
         peripherals.first(where: { $0.id == id })

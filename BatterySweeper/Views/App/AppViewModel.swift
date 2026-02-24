@@ -64,6 +64,9 @@ class AppViewModel: PObserver {
                 model.error = nil
                 
             case .connectedToPeripheral(let cbPeripheral):
+                if model.peripheral(by: cbPeripheral.identifier) == nil {
+                    model.peripherals.append(.init(from: cbPeripheral))
+                }
                 if let peripheral = model.peripheral(by: cbPeripheral.identifier) {
                     model.activePeripheralID = peripheral.id
                 }
