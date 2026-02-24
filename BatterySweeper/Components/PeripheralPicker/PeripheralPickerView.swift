@@ -35,7 +35,7 @@ struct PeripheralPickerView: View {
             
             Picker(label, selection: binding) {
                 Text("").tag(nil as PeripheralModel?)
-                ForEach(model.peripherals, id: \.id) { peripheral in
+                ForEach(model.peripherals.sorted(by: { $0.name < $1.name }), id: \.id ) { peripheral in
                     Text(peripheral.name)
                         .tag(peripheral)
                 }
