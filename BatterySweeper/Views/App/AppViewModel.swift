@@ -56,37 +56,32 @@ class AppViewModel: PObserver {
                     model.error = nil
                 case _:
                     model.peripherals.removeAll()
-                    model.activePeripheral = nil
+                    model.activePeripheralID = nil
                 }
                 
             case .peripheralsDiscovered(let peripherals):
-                for e in peripherals {
-                    if !model.peripherals
-                        .contains(where: { $0.id == e.identifier }) {
-                        model.peripherals.append(.init(from: e))
-                    }
-                }
+                model.peripherals = peripherals.map { .init(from: $0) }
                 model.error = nil
                 
             case .connectedToPeripheral(let cbPeripheral):
-                if let peripheral = model.peripherals
-                    .first(where: { $0.id == cbPeripheral.identifier }) {
-                    model.activePeripheral = peripheral
+                if let peripheral = model.peripheral(by: cbPeripheral.identifier) {
+                    model.activePeripheralID = peripheral.id
                 }
+                stopScan()
                 model.error = nil
                 
             case .failToConnectToPeripheral(let cbPeripheral, let error):
-                if let peripheral = model.activePeripheral,
-                   peripheral.id == cbPeripheral.identifier {
-                    model.activePeripheral = nil
+                if model.activePeripheralID == cbPeripheral.identifier {
+                    model.activePeripheralID = nil
                 }
+                retrieveConnectedPeripherals()
                 model.error = error
                 
             case .disconnectedFromPeripheral(let cbPeripheral):
-                if let peripheral = model.activePeripheral,
-                   peripheral.id == cbPeripheral.identifier {
-                    model.activePeripheral = nil
+                if model.activePeripheralID == cbPeripheral.identifier {
+                    model.activePeripheralID = nil
                 }
+                retrieveConnectedPeripherals()
                 model.error = nil
                 
             case .peripheralUpdated(let cbPeripheral):
@@ -94,11 +89,6 @@ class AppViewModel: PObserver {
                     $0.id == cbPeripheral.identifier
                     ? $0.copyWith(name: cbPeripheral.name, characteristics: nil)
                     : $0
-                }
-                if let active = model.activePeripheral,
-                   active.id == cbPeripheral.identifier,
-                   let peripheral = model.peripherals.first(where: { $0.id == active.id }){
-                    model.activePeripheral = peripheral
                 }
                 model.error = nil
                 
@@ -109,12 +99,6 @@ class AppViewModel: PObserver {
                         .init($0)
                     })
                     : $0
-                }
-                if let active = model.activePeripheral,
-                   active.id == cbPeripheral.identifier,
-                   let peripheral = model.peripherals.first(where: { $0.id == active.id }){
-                    //                model.activePeripheral = nil
-                    model.activePeripheral = peripheral
                 }
                 model.error = nil
             }
@@ -145,7 +129,7 @@ extension AppViewModel {
             peripheral,
             .init(id: .init(), name: "Iaei")
         ]
-        model.activePeripheral = peripheral
+        model.activePeripheralID = peripheral.id
     }
 }
 #endif

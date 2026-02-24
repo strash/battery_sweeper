@@ -13,7 +13,8 @@ struct MainView: View {
     
     var body: some View {
         Group {
-            if let peripheral = model.activePeripheral {
+            if let peripheral = model.activePeripheral,
+               model.activePeripheralID != nil && model.error == nil {
                 // -> active peripheral
                 VStack(alignment: .center, spacing: 5.0) {
                     // -> name
@@ -51,7 +52,7 @@ struct MainView: View {
         .toolbar {
             ToolbarItemGroup {
                 // -> peripheral select
-                if model.activePeripheral != nil {
+                if model.activePeripheralID != nil {
                     PeripheralPickerView("Devices", maxWidth: 130, help: "Devices")
                         .disabled(model.centralState != .poweredOn)
                 }
@@ -83,8 +84,7 @@ struct MainView: View {
 #Preview {
     @Previewable @State var model = AppModel(
         .poweredOn,
-        peripherals: [.init(id: .init(), name: "Sweep Test")],
-        activePeripheral: .init(
+        peripherals: [.init(
             id: .init(),
             name: "Sweep Test",
             characteristics: [
@@ -93,7 +93,8 @@ struct MainView: View {
                 .init(.manufacturerName("ZMK project")),
                 .init(.modelNumber("Cradio")),
             ]
-        ),
+        )],
+        activePeripheralID: nil,
     )
     @Previewable @State var viewModel = AppViewModel()
     

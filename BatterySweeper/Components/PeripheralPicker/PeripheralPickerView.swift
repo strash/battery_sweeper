@@ -24,20 +24,20 @@ struct PeripheralPickerView: View {
     var body: some View {
         if !model.peripherals.isEmpty {
             let binding = Binding(
-                get: { model.activePeripheral },
+                get: { model.activePeripheralID },
                 set: { value in
                     withAnimation {
-                        model.activePeripheral = value
-                        viewModel.connectToPeripheral(with: value?.id)
+                        model.activePeripheralID = value
+                        viewModel.connectToPeripheral(with: value)
                     }
                 }
             )
             
             Picker(label, selection: binding) {
-                Text("").tag(nil as PeripheralModel?)
+                Text("").tag(nil as UUID?)
                 ForEach(model.peripherals.sorted(by: { $0.name < $1.name }), id: \.id ) { peripheral in
                     Text(peripheral.name)
-                        .tag(peripheral)
+                        .tag(peripheral.id)
                 }
             }
             .pickerStyle(.menu)

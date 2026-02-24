@@ -14,20 +14,28 @@ class AppModel {
     var centralState: CBManagerState = .unknown
     var peripherals: [PeripheralModel] = []
     
-    var activePeripheral: PeripheralModel? = nil
+    var activePeripheralID: UUID? = nil
+    
+    var activePeripheral: PeripheralModel? {
+        peripheral(by: activePeripheralID)
+    }
     
     var isScanning: Bool = false
     
     var error: (any Error)? = nil
+    
+    func peripheral(by id: UUID?) -> PeripheralModel? {
+        peripherals.first(where: { $0.id == id })
+    }
 }
 
 #if DEBUG
 extension AppModel {
-    convenience init(_ state: CBManagerState, peripherals: [PeripheralModel], activePeripheral: PeripheralModel) {
+    convenience init(_ state: CBManagerState, peripherals: [PeripheralModel], activePeripheralID: UUID?) {
         self.init()
         self.centralState = state
         self.peripherals = peripherals
-        self.activePeripheral = activePeripheral
+        self.activePeripheralID = activePeripheralID
     }
 }
 #endif
