@@ -21,15 +21,18 @@ struct MainView: View {
                         .font(.largeTitle)
                         .fontWeight(.medium)
                         .fontDesign(.rounded)
+                        .contentTransition(.numericText())
                     
                     // -> model and manufacturer name
-                    Text(model.activeCharacteristics.modelName)
+                    Text(peripheral.characteristics.modelName)
                         .foregroundStyle(.secondary)
                         .padding(.bottom)
                         .fontDesign(.rounded)
+                        .contentTransition(.numericText())
 
                     // -> battery levels
                     BatteryLevelView()
+                        .contentTransition(.opacity)
                 }
             } else {
                 // -> empty state
@@ -81,13 +84,16 @@ struct MainView: View {
     @Previewable @State var model = AppModel(
         .poweredOn,
         peripherals: [.init(id: .init(), name: "Sweep Test")],
-        activePeripheral: .init(id: .init(), name: "Sweep Test"),
-        activeCharacteristics: [
-            .init(characteristic: .batteryLevel(54)),
-            .init(characteristic: .batteryLevel(25)),
-            .init(characteristic: .manufacturerName("ZMK project")),
-            .init(characteristic: .modelNumber("Cradio")),
-        ]
+        activePeripheral: .init(
+            id: .init(),
+            name: "Sweep Test",
+            characteristics: [
+                .init(.batteryLevel(54)),
+                .init(.batteryLevel(25)),
+                .init(.manufacturerName("ZMK project")),
+                .init(.modelNumber("Cradio")),
+            ]
+        ),
     )
     @Previewable @State var viewModel = AppViewModel()
     

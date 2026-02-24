@@ -26,8 +26,10 @@ struct PeripheralPickerView: View {
             let binding = Binding(
                 get: { model.activePeripheral },
                 set: { value in
-                    model.activePeripheral = value
-                    viewModel.connectToPeripheral(with: value?.id)
+                    withAnimation {
+                        model.activePeripheral = value
+                        viewModel.connectToPeripheral(with: value?.id)
+                    }
                 }
             )
             

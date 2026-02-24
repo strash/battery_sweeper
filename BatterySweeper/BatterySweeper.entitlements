@@ -4,7 +4,9 @@
 <dict>
 	<key>com.apple.security.app-sandbox</key>
 	<true/>
-	<key>com.apple.security.device.bluetooth</key>
-	<true/>
+	<key>com.apple.security.application-groups</key>
+	<array>
+		<string>group.ru.strash.battery_sweeper</string>
+	</array>
 </dict>
 </plist>

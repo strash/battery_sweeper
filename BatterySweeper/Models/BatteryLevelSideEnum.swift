@@ -28,7 +28,7 @@ enum EBatteryLevelSide {
     
     /// For cases when there is more than one characeristic
     static func from(index: Int) -> EBatteryLevelSide {
-        return switch index {
+        switch index {
         case 0: .left
         case 1: .right
         default: .other

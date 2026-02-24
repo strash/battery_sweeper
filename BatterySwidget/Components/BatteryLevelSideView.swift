@@ -1,8 +1,8 @@
 //
 //  BatteryLevelSideView.swift
-//  BatterySweeper
+//  BatterySwidgetExtension
 //
-//  Created by Dmitry Poyarkov on 2/19/26.
+//  Created by Dmitry Poyarkov on 2/22/26.
 //
 
 import SwiftUI
@@ -25,7 +25,6 @@ struct BatteryLevelSideView: View {
             // -> level
             Text("\(level)%")
                 .fontWeight(.medium)
-                .contentTransition(.numericText())
         }
         .fontDesign(.rounded)
     }

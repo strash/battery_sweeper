@@ -15,7 +15,6 @@ class AppModel {
     var peripherals: [PeripheralModel] = []
     
     var activePeripheral: PeripheralModel? = nil
-    var activeCharacteristics: [CharacteristicModel] = []
     
     var isScanning: Bool = false
     
@@ -24,12 +23,11 @@ class AppModel {
 
 #if DEBUG
 extension AppModel {
-    convenience init(_ state: CBManagerState, peripherals: [PeripheralModel], activePeripheral: PeripheralModel, activeCharacteristics: [CharacteristicModel]) {
+    convenience init(_ state: CBManagerState, peripherals: [PeripheralModel], activePeripheral: PeripheralModel) {
         self.init()
         self.centralState = state
         self.peripherals = peripherals
         self.activePeripheral = activePeripheral
-        self.activeCharacteristics = activeCharacteristics
     }
 }
 #endif
