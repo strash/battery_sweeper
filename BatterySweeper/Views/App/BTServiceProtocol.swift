@@ -12,5 +12,5 @@ protocol PBTService {
     func scanPeripherals() -> Void
     func stopScan() -> Void
     func connectToPeripheral(with uuid: UUID?) -> Void
-    func tryToReconnenct() -> Void
+    func restoreConnection() -> Void
 }

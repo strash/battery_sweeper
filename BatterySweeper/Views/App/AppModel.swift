@@ -8,28 +8,45 @@
 import Foundation
 import CoreBluetooth
 import SwiftUI
+import WidgetKit
 
 @Observable
 class AppModel {
     var centralState: CBManagerState = .unknown
     var peripherals: [PeripheralModel] = []
     
-    var activePeripheral: PeripheralModel? = nil
-    var activeCharacteristics: [CharacteristicModel] = []
-    
     var isScanning: Bool = false
     
     var error: (any Error)? = nil
+
+    var activePeripheralID: UUID? = nil
+    var activePeripheral: PeripheralModel? {
+        peripheral(by: activePeripheralID)
+    }
+    
+    func peripheral(by id: UUID?) -> PeripheralModel? {
+        peripherals.first(where: { $0.id == id })
+    }
+    
+    func save() -> Void {
+        guard let userDefs = UserDefaults(suiteName: kSharedGroupName) else {
+            return
+        }
+        let encoder = JSONEncoder()
+        if let data = try? encoder.encode(peripherals) {
+            userDefs.set(data, forKey: kPeripheralsKey)
+            WidgetCenter.shared.reloadAllTimelines()
+        }
+    }
 }
 
 #if DEBUG
 extension AppModel {
-    convenience init(_ state: CBManagerState, peripherals: [PeripheralModel], activePeripheral: PeripheralModel, activeCharacteristics: [CharacteristicModel]) {
+    convenience init(_ state: CBManagerState, peripherals: [PeripheralModel], activePeripheralID: UUID?) {
         self.init()
         self.centralState = state
         self.peripherals = peripherals
-        self.activePeripheral = activePeripheral
-        self.activeCharacteristics = activeCharacteristics
+        self.activePeripheralID = activePeripheralID
     }
 }
 #endif

@@ -14,66 +14,50 @@ class BTService: BTServiceDelegate, PBTService {
         super.init(with: subject)
     }
     
-    func retrieveConnectedPeripherals() -> Void {
-        guard super.centralManager.state == .poweredOn else {
-            return
-        }
-        let peripherals = super.centralManager.retrieveConnectedPeripherals(
-            withServices: [super.batteryServiceUUID]
-        )
-        super.availablePeripherals.removeAll()
-        for peripheral in peripherals {
-            super.availablePeripherals.insert(peripheral)
-            super.subject?.notify(.peripheralDiscovered(peripheral))
-        }
-    }
-    
     func scanPeripherals() -> Void {
-        guard super.centralManager.state == .poweredOn && !super.centralManager.isScanning else {
+        guard super.central.state == .poweredOn && !super.central.isScanning else {
             return
         }
-        super.centralManager.scanForPeripherals(
-            withServices: [super.batteryServiceUUID],
+        super.central.scanForPeripherals(
+            withServices: [BTConstants.batteryServiceUUID],
             options:  [CBCentralManagerScanOptionAllowDuplicatesKey: true]
         )
     }
     
     func stopScan() -> Void {
-        guard super.centralManager.state == .poweredOn && super.centralManager.isScanning else {
+        guard super.central.state == .poweredOn && super.central.isScanning else {
             return
         }
-        super.centralManager.stopScan()
+        super.central.stopScan()
     }
     
     func connectToPeripheral(with uuid: UUID?) -> Void {
-        if let activePeripheral {
-            disconnectAndCancel(activePeripheral)
-            super.activePeripheral = nil
-        }
         guard let peripheral = super.availablePeripherals.first(where: { $0.identifier == uuid }) else {
             return
         }
-        super.centralManager.connect(
+        super.central.connect(
             peripheral,
             options: [CBConnectPeripheralOptionEnableAutoReconnect: true]
         )
     }
     
-    func tryToReconnenct() -> Void {
-        guard let activePeripheral else {
-            return
-        }
+    func restoreConnection() -> Void {
+        invalidateTimer()
         self.timer = Timer(timeInterval: 5, repeats: true) { _ in
-            self.connectToPeripheral(with: activePeripheral.identifier)
+            self.availablePeripherals.forEach {
+                self.connectToPeripheral(with: $0.identifier)
+            }
         }
         RunLoop.main.add(self.timer!, forMode: .common)
     }
     
     override func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) -> Void {
-        if let timer, timer.isValid {
-            timer.invalidate()
-        }
+        invalidateTimer()
         super.centralManager(central, didConnect: peripheral)
+    }
+    
+    private func invalidateTimer() {
+        if let timer, timer.isValid { timer.invalidate() }
     }
 }
 

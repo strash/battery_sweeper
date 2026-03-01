@@ -7,14 +7,11 @@
 
 import SwiftUI
 
-let kMainWindowID: String = "main_window"
-
 @main
 struct BatterySweeperApp: App {
     private let subject: EventService = .init()
     private var viewModel: AppViewModel
     @State private var model: AppModel
-    
     
     init() {
         let model: AppModel = .init()
@@ -47,6 +44,7 @@ struct BatterySweeperApp: App {
                 .onAppear {
 #if !DEBUG
                     NSApplication.shared.activate(ignoringOtherApps: true)
+                    viewModel.retrieveConnectedPeripherals()
 #endif
                 }
         }

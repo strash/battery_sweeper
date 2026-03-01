@@ -7,6 +7,8 @@
 
 import Foundation
 
-protocol PObserver: AnyObject, Identifiable {
+protocol PObserver: Identifiable {
+    var id: UUID { get }
+    
     func onData(_ event: EEvent) -> Void
 }

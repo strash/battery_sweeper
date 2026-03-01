@@ -9,72 +9,30 @@ import Foundation
 import CoreBluetooth
 
 class BTServiceDelegate: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
-    private let BT_BATTERY_SERVICE_UUID = "0x180F"
-    private let BT_DEVICE_INFORMATION_SERVICE_UUID = "0x180A"
-    private let BT_BATTERY_LEVEL_CHARACTERISTIC_UUID = "0x2A19"
-    private let BT_MODEL_NUMBER_STRING_CHARACTERISTIC_UUID = "0x2A24"
-    private let BT_MANUFACTURER_NAME_STRING_CHARACTERISTIC_UUID = "0x2A29"
-    
-    var centralManager: CBCentralManager!
-    var activePeripheral: CBPeripheral? = nil
+    var central: CBCentralManager!
     var availablePeripherals: Set<CBPeripheral> = []
     
     var subject: EventService? = nil
     
+    private let option = CBConnectPeripheralOptionEnableAutoReconnect
+
     init(with subject: EventService) {
         super.init()
-        centralManager = CBCentralManager(delegate: self, queue: nil)
+        central = CBCentralManager(delegate: self, queue: nil)
         self.subject = subject
     }
     
     deinit {
-        if let activePeripheral {
-            disconnectAndCancel(activePeripheral)
-            self.activePeripheral = nil
-        }
-        for peripheral in availablePeripherals {
-            disconnectAndCancel(peripheral)
-        }
-        availablePeripherals.removeAll()
+        clean()
     }
-    
-    var batteryServiceUUID: CBUUID {
-        CBUUID(string: BT_BATTERY_SERVICE_UUID)
-    }
-    
-    var deviceInformationServiceUUID: CBUUID {
-        CBUUID(string: BT_DEVICE_INFORMATION_SERVICE_UUID)
-    }
-    
-    var batteryLevelCharacteristicUUID: CBUUID {
-        CBUUID(string: BT_BATTERY_LEVEL_CHARACTERISTIC_UUID)
-    }
-    
-    var modelNumberStringCharacteristicUUID: CBUUID {
-        CBUUID(string: BT_MODEL_NUMBER_STRING_CHARACTERISTIC_UUID)
-    }
-    
-    var manufacturerNameStringCharacteristicUUID: CBUUID {
-        CBUUID(string: BT_MANUFACTURER_NAME_STRING_CHARACTERISTIC_UUID)
-    }
-    
+
     // on update state
     func centralManagerDidUpdateState(_ central: CBCentralManager) -> Void {
-        subject?.notify(.centralStateChanged(central.state))
-        switch central.state {
-        case .poweredOn:
-            break
-        default:
-            break
-            //            if let activePeripheral {
-            //                disconnectAndCancel(activePeripheral)
-            //                self.activePeripheral = nil
-            //                subject?.notify(.disconnectedFromPeripheral(activePeripheral))
-            //            }
-            //            for peripheral in availablePeripherals {
-            //                disconnectAndCancel(peripheral)
-            //            }
-            //            availablePeripherals.removeAll()
+        self.subject?.notify(.centralStateChanged(central.state))
+        if central.state == .poweredOn {
+            retrieveConnectedPeripherals()
+        } else {
+            clean()
         }
     }
     
@@ -82,81 +40,67 @@ class BTServiceDelegate: NSObject, CBCentralManagerDelegate, CBPeripheralDelegat
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) -> Void {
         availablePeripherals.insert(peripheral)
         peripheral.delegate = self
-        subject?.notify(.peripheralDiscovered(peripheral))
+        self.subject?.notify(.peripheralsDiscovered([peripheral]))
+        self.central.connect(peripheral, options: [option: true])
     }
     
     // on connect to a peripheral
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) -> Void {
-        activePeripheral = peripheral
         peripheral.delegate = self
-        peripheral.discoverServices([batteryServiceUUID, deviceInformationServiceUUID])
-        subject?.notify(.connectedToPeripheral(peripheral))
+        peripheral.discoverServices([
+            BTConstants.batteryServiceUUID,
+            BTConstants.deviceInformationServiceUUID
+        ])
+        self.subject?.notify(.connectedToPeripheral(peripheral))
     }
     
     // on fail to connect to a peripheral
-    func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: (any Error)?) {
-        if let error {
-            print(error)
-        }
-        subject?.notify(.failToConnectToPeripheral(peripheral, error))
+    func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: (any Error)?) -> Void {
+        if let error { print(error) }
+        self.subject?.notify(.failToConnectToPeripheral(peripheral, error))
     }
     
     // on disconnect from a peripheral
-    func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: (any Error)?) {
-        if let error {
-            print(error)
-        }
-        subject?.notify(.disconnectedFromPeripheral(peripheral))
+    func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: (any Error)?) -> Void {
+        if let error { print(error) }
+        self.subject?.notify(.disconnectedFromPeripheral(peripheral))
     }
     
     // on reconnect
-    func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, timestamp: CFAbsoluteTime, isReconnecting: Bool, error: (any Error)?) {
-        if let error {
-            print(error)
-        }
+    func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, timestamp: CFAbsoluteTime, isReconnecting: Bool, error: (any Error)?) -> Void {
+        if let error { print(error) }
         if isReconnecting {
-            subject?.notify(.connectedToPeripheral(peripheral))
+            self.subject?.notify(.connectedToPeripheral(peripheral))
         }
     }
     
-    func peripheralDidUpdateName(_ peripheral: CBPeripheral) {
+    func peripheralDidUpdateName(_ peripheral: CBPeripheral) -> Void {
         let index = availablePeripherals.firstIndex(where: { $0.identifier == peripheral.identifier })
         if let index {
             availablePeripherals.remove(at: index)
             availablePeripherals.insert(peripheral)
         }
-        if let activePeripheral, activePeripheral.identifier == peripheral.identifier {
-            self.activePeripheral = peripheral
-        }
-        subject?.notify(.peripheralUpdated(peripheral))
+        self.subject?.notify(.peripheralUpdated(peripheral))
     }
     
     // on discover a services
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: (any Error)?) -> Void {
-        if let error {
-            print(error)
-        }
-        guard let services = peripheral.services else {
-            return
-        }
+        if let error { print(error) }
+        guard let services = peripheral.services else { return }
         for service in services {
             peripheral.delegate = self
             peripheral.discoverCharacteristics([
-                batteryLevelCharacteristicUUID,
-                modelNumberStringCharacteristicUUID,
-                manufacturerNameStringCharacteristicUUID,
+                BTConstants.batteryLevelCharacteristicUUID,
+                BTConstants.modelNumberStringCharacteristicUUID,
+                BTConstants.manufacturerNameStringCharacteristicUUID,
             ], for: service)
         }
     }
     
     // on discover a characteristics
     func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: (any Error)?) -> Void {
-        if let error {
-            print(error)
-        }
-        guard let characteristics = service.characteristics else {
-            return
-        }
+        if let error { print(error) }
+        guard let characteristics = service.characteristics else { return }
         for characteristic in characteristics {
             peripheral.delegate = self
             peripheral.readValue(for: characteristic)
@@ -165,64 +109,45 @@ class BTServiceDelegate: NSObject, CBCentralManagerDelegate, CBPeripheralDelegat
     
     // on discover or change of a value
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: (any Error)?) -> Void {
-        if let error {
-            print(error)
-        }
-        if characteristic.uuid == batteryLevelCharacteristicUUID && !characteristic.isNotifying {
+        if let error { print(error) }
+        if characteristic.uuid == BTConstants.batteryLevelCharacteristicUUID && !characteristic.isNotifying {
             peripheral.delegate = self
             peripheral.setNotifyValue(true, for: characteristic)
         }
-        subject?.notify(.characteristicDiscovered(
-            getCharacteristics(from: characteristic, for: peripheral.identifier))
+        let values = characteristic.allFromService
+            .map { $0.toValue }
+            .filter { $0 != nil } as! [ECharacteristic]
+        if !values.isEmpty {
+            self.subject?.notify(.characteristicsDiscovered(peripheral, values))
+        }
+    }
+    
+    func retrieveConnectedPeripherals() -> Void {
+        guard central.state == .poweredOn else { return }
+        let peripherals = central.retrieveConnectedPeripherals(
+            withServices: [BTConstants.batteryServiceUUID]
         )
+        availablePeripherals.removeAll()
+        availablePeripherals.formUnion(peripherals)
+        self.subject?.notify(.peripheralsDiscovered(peripherals))
+        peripherals.forEach {
+            self.central.connect($0, options: [option: true])
+        }
     }
-    
-    func getCharacteristics(from characteristic: CBCharacteristic, for id: UUID) -> [BTCharacteristicDto] {
-        var chars: [BTCharacteristicDto] = []
-        if let services = characteristic.service?.peripheral?.services {
-            for s in services {
-                if let characteristics = s.characteristics {
-                    for c in characteristics {
-                        guard let v = c.value else {
-                            continue
-                        }
-                        switch c.uuid {
-                        case batteryLevelCharacteristicUUID:
-                            let data = NSData(data: v)
-                            chars.append(.init(id: id, value: .batteryLevel(data.bytes.load(as: Int.self))))
-                        case manufacturerNameStringCharacteristicUUID:
-                            let value = String(data: v, encoding: .utf8)
-                            if let value {
-                                chars.append(.init(id: id, value: .manufacturerName(value)))
-                            }
-                        case modelNumberStringCharacteristicUUID:
-                            let value = String(data: v, encoding: .utf8)
-                            if let value {
-                                chars.append(.init(id: id, value: .modelNumber(value)))
-                            }
-                        default:
-                            continue
-                        }
-                    }
-                }
+
+    func cancel(_ peripheral: CBPeripheral?) -> Void {
+        guard let peripheral else { return }
+        if let services = peripheral.services {
+            for service in services {
+                guard let chars = service.characteristics else { continue }
+                chars.forEach { peripheral.setNotifyValue(false, for: $0) }
             }
         }
-        return chars
+        central.cancelPeripheralConnection(peripheral)
     }
     
-    func disconnectAndCancel(_ peripheral: CBPeripheral?) -> Void {
-        if let peripheral {
-            if let services = peripheral.services {
-                for service in services {
-                    guard let characteristics = service.characteristics else {
-                        continue
-                    }
-                    for characteristic in characteristics {
-                        peripheral.setNotifyValue(false, for: characteristic)
-                    }
-                }
-            }
-            centralManager.cancelPeripheralConnection(peripheral)
-        }
+    func clean() -> Void {
+        availablePeripherals.forEach { cancel($0) }
+        availablePeripherals.removeAll()
     }
 }

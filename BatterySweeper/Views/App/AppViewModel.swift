@@ -10,6 +10,7 @@ import CoreBluetooth
 
 @Observable
 class AppViewModel: PObserver {
+    let id = UUID()
     private let btService: PBTService
     private var sub: Result<Subscription, SubscriptionError>?
     
@@ -22,9 +23,7 @@ class AppViewModel: PObserver {
     }
     
     deinit {
-        if case .success(let s) = sub  {
-            s.cancel()
-        }
+        if case .success(let s) = sub { s.cancel() }
     }
     
     func retrieveConnectedPeripherals() -> Void {
@@ -42,61 +41,69 @@ class AppViewModel: PObserver {
         btService.stopScan()
     }
     
-    func connectToPeripheral(with id: UUID?) -> Void {
-        btService.connectToPeripheral(with: id)
-    }
-    
     func onData(_ event: EEvent) -> Void {
-        switch event {
-        case .centralStateChanged(let state):
-            model.centralState = state
-            switch state {
-            case .poweredOn:
-                retrieveConnectedPeripherals()
-                btService.tryToReconnenct()
+        withAnimation {
+            switch event {
+            case .centralStateChanged(let state):
+                model.centralState = state
+                switch state {
+                case .poweredOn:
+                    btService.restoreConnection()
+                    model.error = nil
+                case _:
+                    model.peripherals.removeAll()
+                    model.activePeripheralID = nil
+                }
+                
+            case .peripheralsDiscovered(let peripherals):
+                model.peripherals = peripherals.map { .init(from: $0) }
                 model.error = nil
-            case _:
-                model.peripherals.removeAll()
-                model.activePeripheral = nil
+                model.save()
+                
+            case .connectedToPeripheral(let cbPeripheral):
+                if model.peripheral(by: cbPeripheral.identifier) == nil {
+                    var peripherals = model.peripherals
+                    peripherals.append(.init(from: cbPeripheral))
+                    model.peripherals = peripherals
+                }
+                stopScan()
+                model.error = nil
+                model.save()
+                
+            case .failToConnectToPeripheral(let cbPeripheral, let error):
+                if model.activePeripheralID == cbPeripheral.identifier {
+                    model.activePeripheralID = nil
+                }
+                retrieveConnectedPeripherals()
+                model.error = error
+                
+            case .disconnectedFromPeripheral(let cbPeripheral):
+                if model.activePeripheralID == cbPeripheral.identifier {
+                    model.activePeripheralID = nil
+                }
+                retrieveConnectedPeripherals()
+                model.error = nil
+                
+            case .peripheralUpdated(let cbPeripheral):
+                model.peripherals = model.peripherals.map {
+                    $0.id == cbPeripheral.identifier
+                    ? $0.copyWith(name: cbPeripheral.name, characteristics: nil)
+                    : $0
+                }
+                model.error = nil
+                model.save()
+                
+            case .characteristicsDiscovered(let cbPeripheral, let characteristics):
+                model.peripherals = model.peripherals.map {
+                    $0.id == cbPeripheral.identifier
+                    ? $0.copyWith(name: nil, characteristics: characteristics.map {
+                        .init($0)
+                    })
+                    : $0
+                }
+                model.error = nil
+                model.save()
             }
-            
-        case .peripheralDiscovered(let peripheral):
-            if !model.peripherals.contains(where: { $0.id == peripheral.identifier }) {
-                model.peripherals.append(.init(from: peripheral))
-            }
-            model.error = nil
-            
-        case .connectedToPeripheral(let cbPeripheral):
-            if let peripheral = model.peripherals.first(where: { $0.id == cbPeripheral.identifier }) {
-                model.activePeripheral = peripheral
-                model.activeCharacteristics.removeAll()
-            }
-            model.error = nil
-            
-        case .failToConnectToPeripheral(_, let error):
-            model.activePeripheral = nil
-            model.activeCharacteristics.removeAll()
-            model.error = error
-            
-        case .disconnectedFromPeripheral(let cbPeripheral):
-            if let activePeripheral = model.activePeripheral, activePeripheral.id == cbPeripheral.identifier {
-                model.activePeripheral = nil
-                model.activeCharacteristics.removeAll()
-            }
-            model.error = nil
-        
-        case .peripheralUpdated(let cbPeripheral):
-            model.peripherals = model.peripherals.map {
-                $0.id == cbPeripheral.identifier ? .init(from: cbPeripheral) : $0
-            }
-            if let activePeripheral = model.activePeripheral, activePeripheral.id == cbPeripheral.identifier {
-                model.activePeripheral = .init(from: cbPeripheral)
-            }
-            
-        case .characteristicDiscovered(let characteristics):
-            model.activeCharacteristics = characteristics.map { .init(from: $0) }
-            model.error = nil
-            
         }
     }
 }
@@ -109,18 +116,22 @@ extension AppViewModel {
             subject: .init(),
             model: .init()
         )
+        let peripheral: PeripheralModel = .init(
+            id: .init(),
+            name: "Sweep Test",
+            characteristics: [
+                .init(.batteryLevel(54)),
+                .init(.batteryLevel(25)),
+                .init(.manufacturerName("ZMK project")),
+                .init(.modelNumber("Cradio")),
+            ]
+        )
         model.centralState = .poweredOn
         model.peripherals = [
-            .init(id: .init(), name: "Sweep Test"),
+            peripheral,
             .init(id: .init(), name: "Iaei")
         ]
-        model.activePeripheral = .init(id: .init(), name: "Sweep Test")
-        model.activeCharacteristics = [
-            .init(characteristic: .batteryLevel(54)),
-            .init(characteristic: .batteryLevel(25)),
-            .init(characteristic: .manufacturerName("ZMK project")),
-            .init(characteristic: .modelNumber("Cradio")),
-        ]
+        model.activePeripheralID = peripheral.id
     }
 }
 #endif

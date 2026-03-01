@@ -1,0 +1,38 @@
+//
+//  WidgetView.swift
+//  BatterySwidgetExtension
+//
+//  Created by Dmitry Poyarkov on 2/20/26.
+//
+
+import SwiftUI
+
+struct MainView: View {
+    var entry: PeripheralDetailsProvider.Entry
+    
+    var body: some View {
+        if let peripheral = entry.peripheral {
+            // -> active peripheral
+            VStack(alignment: .leading, spacing: 5.0) {
+                // -> name
+                Text(peripheral.name)
+                    .font(.largeTitle)
+                    .fontWeight(.medium)
+                    .fontDesign(.rounded)
+                
+                // -> model and manufacturer name
+                Text(peripheral.characteristics.modelName)
+                    .foregroundStyle(.secondary)
+                    .padding(.bottom)
+                    .fontDesign(.rounded)
+                
+                // -> battery levels
+                BatteryLevelView(entry: entry)
+            }
+        } else {
+            // -> empty state
+            Text("Disconnected")
+                .fontDesign(.rounded)
+        }
+    }
+}

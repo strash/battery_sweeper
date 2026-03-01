@@ -13,7 +13,8 @@ struct MainView: View {
     
     var body: some View {
         Group {
-            if let peripheral = model.activePeripheral {
+            if let peripheral = model.activePeripheral,
+               model.activePeripheralID != nil && model.error == nil {
                 // -> active peripheral
                 VStack(alignment: .center, spacing: 5.0) {
                     // -> name
@@ -21,15 +22,18 @@ struct MainView: View {
                         .font(.largeTitle)
                         .fontWeight(.medium)
                         .fontDesign(.rounded)
+                        .contentTransition(.numericText())
                     
                     // -> model and manufacturer name
-                    Text(model.activeCharacteristics.modelName)
+                    Text(peripheral.characteristics.modelName)
                         .foregroundStyle(.secondary)
                         .padding(.bottom)
                         .fontDesign(.rounded)
+                        .contentTransition(.numericText())
 
                     // -> battery levels
                     BatteryLevelView()
+                        .contentTransition(.opacity)
                 }
             } else {
                 // -> empty state
@@ -48,7 +52,7 @@ struct MainView: View {
         .toolbar {
             ToolbarItemGroup {
                 // -> peripheral select
-                if model.activePeripheral != nil {
+                if model.activePeripheralID != nil {
                     PeripheralPickerView("Devices", maxWidth: 130, help: "Devices")
                         .disabled(model.centralState != .poweredOn)
                 }
@@ -80,14 +84,17 @@ struct MainView: View {
 #Preview {
     @Previewable @State var model = AppModel(
         .poweredOn,
-        peripherals: [.init(id: .init(), name: "Sweep Test")],
-        activePeripheral: .init(id: .init(), name: "Sweep Test"),
-        activeCharacteristics: [
-            .init(characteristic: .batteryLevel(54)),
-            .init(characteristic: .batteryLevel(25)),
-            .init(characteristic: .manufacturerName("ZMK project")),
-            .init(characteristic: .modelNumber("Cradio")),
-        ]
+        peripherals: [.init(
+            id: .init(),
+            name: "Sweep Test",
+            characteristics: [
+                .init(.batteryLevel(54)),
+                .init(.batteryLevel(25)),
+                .init(.manufacturerName("ZMK project")),
+                .init(.modelNumber("Cradio")),
+            ]
+        )],
+        activePeripheralID: nil,
     )
     @Previewable @State var viewModel = AppViewModel()
     

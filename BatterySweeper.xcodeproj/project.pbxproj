@@ -6,7 +6,22 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		1B2445182F486E9500CEB036 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1B2445172F486E9400CEB036 /* WidgetKit.framework */; };
+		1B2445192F486E9500CEB036 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BCC05772D5D496100390C39 /* SwiftUI.framework */; };
+		1B2445262F486E9600CEB036 /* BatterySwidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 1B2445162F486E9400CEB036 /* BatterySwidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		1BAC12782F54CAC00083E1CC /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BAC12772F54CAC00083E1CC /* Constants.swift */; };
+		1BAC12792F54CAC00083E1CC /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BAC12772F54CAC00083E1CC /* Constants.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
+		1B2445242F486E9600CEB036 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1B71AFB92D554D6C0014647A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1B2445152F486E9400CEB036;
+			remoteInfo = BatterySwidgetExtension;
+		};
 		1BCA3EAA2D6526FB00649D3D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 1B71AFB92D554D6C0014647A /* Project object */;
@@ -23,6 +38,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
+				1B2445262F486E9600CEB036 /* BatterySwidgetExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -30,11 +46,31 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1B2445162F486E9400CEB036 /* BatterySwidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BatterySwidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		1B2445172F486E9400CEB036 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		1B71AFC12D554D6C0014647A /* BatterySweeper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BatterySweeper.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1BAC12772F54CAC00083E1CC /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		1BCC05772D5D496100390C39 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		1B24452A2F486E9600CEB036 /* Exceptions for "BatterySwidget" folder in "BatterySwidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 1B2445152F486E9400CEB036 /* BatterySwidgetExtension */;
+		};
+		1B2445362F4884E300CEB036 /* Exceptions for "BatterySweeper" folder in "BatterySwidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Models/BatteryLevelSideEnum.swift,
+				Models/CharacteristicModel.swift,
+				Models/CharacteristicValueEnum.swift,
+				Models/PeripheralModel.swift,
+			);
+			target = 1B2445152F486E9400CEB036 /* BatterySwidgetExtension */;
+		};
 		1BEB17572D56B32E003C7300 /* Exceptions for "BatterySweeper" folder in "BatterySweeper" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -45,10 +81,19 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		1B24451A2F486E9500CEB036 /* BatterySwidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				1B24452A2F486E9600CEB036 /* Exceptions for "BatterySwidget" folder in "BatterySwidgetExtension" target */,
+			);
+			path = BatterySwidget;
+			sourceTree = "<group>";
+		};
 		1B71AFC32D554D6C0014647A /* BatterySweeper */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				1BEB17572D56B32E003C7300 /* Exceptions for "BatterySweeper" folder in "BatterySweeper" target */,
+				1B2445362F4884E300CEB036 /* Exceptions for "BatterySweeper" folder in "BatterySwidgetExtension" target */,
 			);
 			path = BatterySweeper;
 			sourceTree = "<group>";
@@ -56,6 +101,15 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		1B2445132F486E9400CEB036 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1B2445192F486E9500CEB036 /* SwiftUI.framework in Frameworks */,
+				1B2445182F486E9500CEB036 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		1B71AFBE2D554D6C0014647A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -69,7 +123,9 @@
 		1B71AFB82D554D6C0014647A = {
 			isa = PBXGroup;
 			children = (
+				1BAC12772F54CAC00083E1CC /* Constants.swift */,
 				1B71AFC32D554D6C0014647A /* BatterySweeper */,
+				1B24451A2F486E9500CEB036 /* BatterySwidget */,
 				1BCC05742D5D496100390C39 /* Frameworks */,
 				1B71AFC22D554D6C0014647A /* Products */,
 			);
@@ -79,6 +135,7 @@
 			isa = PBXGroup;
 			children = (
 				1B71AFC12D554D6C0014647A /* BatterySweeper.app */,
+				1B2445162F486E9400CEB036 /* BatterySwidgetExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -87,6 +144,7 @@
 			isa = PBXGroup;
 			children = (
 				1BCC05772D5D496100390C39 /* SwiftUI.framework */,
+				1B2445172F486E9400CEB036 /* WidgetKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -94,6 +152,28 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		1B2445152F486E9400CEB036 /* BatterySwidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1B2445292F486E9600CEB036 /* Build configuration list for PBXNativeTarget "BatterySwidgetExtension" */;
+			buildPhases = (
+				1B2445122F486E9400CEB036 /* Sources */,
+				1B2445132F486E9400CEB036 /* Frameworks */,
+				1B2445142F486E9400CEB036 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				1B24451A2F486E9500CEB036 /* BatterySwidget */,
+			);
+			name = BatterySwidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = BatterySwidgetExtension;
+			productReference = 1B2445162F486E9400CEB036 /* BatterySwidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		1B71AFC02D554D6C0014647A /* BatterySweeper */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1B71AFD02D554D6D0014647A /* Build configuration list for PBXNativeTarget "BatterySweeper" */;
@@ -107,6 +187,7 @@
 			);
 			dependencies = (
 				1BCA3EAB2D6526FB00649D3D /* PBXTargetDependency */,
+				1B2445252F486E9600CEB036 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				1B71AFC32D554D6C0014647A /* BatterySweeper */,
@@ -125,9 +206,12 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1620;
+				LastSwiftUpdateCheck = 2620;
 				LastUpgradeCheck = 2620;
 				TargetAttributes = {
+					1B2445152F486E9400CEB036 = {
+						CreatedOnToolsVersion = 26.2;
+					};
 					1B71AFC02D554D6C0014647A = {
 						CreatedOnToolsVersion = 16.2;
 					};
@@ -148,11 +232,19 @@
 			projectRoot = "";
 			targets = (
 				1B71AFC02D554D6C0014647A /* BatterySweeper */,
+				1B2445152F486E9400CEB036 /* BatterySwidgetExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		1B2445142F486E9400CEB036 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		1B71AFBF2D554D6C0014647A /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -163,16 +255,30 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		1B2445122F486E9400CEB036 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1BAC12792F54CAC00083E1CC /* Constants.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		1B71AFBD2D554D6C0014647A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1BAC12782F54CAC00083E1CC /* Constants.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		1B2445252F486E9600CEB036 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1B2445152F486E9400CEB036 /* BatterySwidgetExtension */;
+			targetProxy = 1B2445242F486E9600CEB036 /* PBXContainerItemProxy */;
+		};
 		1BCA3EAB2D6526FB00649D3D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			targetProxy = 1BCA3EAA2D6526FB00649D3D /* PBXContainerItemProxy */;
@@ -180,6 +286,100 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		1B2445272F486E9600CEB036 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = BatterySwidget/BatterySwidgetExtension.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 5;
+				DEVELOPMENT_TEAM = JR3JVRY5VP;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_INCOMING_NETWORK_CONNECTIONS = NO;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = NO;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
+				ENABLE_RESOURCE_ACCESS_BLUETOOTH = NO;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
+				ENABLE_RESOURCE_ACCESS_CAMERA = NO;
+				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
+				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
+				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
+				ENABLE_RESOURCE_ACCESS_USB = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = BatterySwidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = BatterySwidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.6;
+				MARKETING_VERSION = 1.4;
+				PRODUCT_BUNDLE_IDENTIFIER = ru.strash.BatterySweeper.BatterySwidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				REGISTER_APP_GROUPS = YES;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		1B2445282F486E9600CEB036 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = BatterySwidget/BatterySwidgetExtension.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 5;
+				DEVELOPMENT_TEAM = JR3JVRY5VP;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_INCOMING_NETWORK_CONNECTIONS = NO;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = NO;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
+				ENABLE_RESOURCE_ACCESS_BLUETOOTH = NO;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
+				ENABLE_RESOURCE_ACCESS_CAMERA = NO;
+				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
+				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
+				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
+				ENABLE_RESOURCE_ACCESS_USB = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = BatterySwidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = BatterySwidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.6;
+				MARKETING_VERSION = 1.4;
+				PRODUCT_BUNDLE_IDENTIFIER = ru.strash.BatterySweeper.BatterySwidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				REGISTER_APP_GROUPS = YES;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 		1B71AFCE2D554D6D0014647A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -312,28 +512,40 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"BatterySweeper/Preview Content\"";
 				DEVELOPMENT_TEAM = JR3JVRY5VP;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_INCOMING_NETWORK_CONNECTIONS = NO;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = NO;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
 				ENABLE_RESOURCE_ACCESS_BLUETOOTH = YES;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
+				ENABLE_RESOURCE_ACCESS_CAMERA = NO;
+				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
+				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
+				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
+				ENABLE_RESOURCE_ACCESS_USB = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = BatterySweeper/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Battery Sweeper";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Trust me!";
+				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "Trust me!";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 1.3;
+				MACOSX_DEPLOYMENT_TARGET = 15.6;
+				MARKETING_VERSION = 1.4;
 				PRODUCT_BUNDLE_IDENTIFIER = ru.strash.BatterySweeper;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};
@@ -349,28 +561,40 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"BatterySweeper/Preview Content\"";
 				DEVELOPMENT_TEAM = JR3JVRY5VP;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_INCOMING_NETWORK_CONNECTIONS = NO;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = NO;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
 				ENABLE_RESOURCE_ACCESS_BLUETOOTH = YES;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
+				ENABLE_RESOURCE_ACCESS_CAMERA = NO;
+				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
+				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
+				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
+				ENABLE_RESOURCE_ACCESS_USB = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = BatterySweeper/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Battery Sweeper";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Trust me!";
+				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "Trust me!";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 1.3;
+				MACOSX_DEPLOYMENT_TARGET = 15.6;
+				MARKETING_VERSION = 1.4;
 				PRODUCT_BUNDLE_IDENTIFIER = ru.strash.BatterySweeper;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};
@@ -379,6 +603,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		1B2445292F486E9600CEB036 /* Build configuration list for PBXNativeTarget "BatterySwidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1B2445272F486E9600CEB036 /* Debug */,
+				1B2445282F486E9600CEB036 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		1B71AFBC2D554D6C0014647A /* Build configuration list for PBXProject "BatterySweeper" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
