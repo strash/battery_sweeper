@@ -32,10 +32,6 @@ class BTService: BTServiceDelegate, PBTService {
     }
     
     func connectToPeripheral(with uuid: UUID?) -> Void {
-        if let activePeripheral {
-            cancel(activePeripheral)
-            super.activePeripheral = nil
-        }
         guard let peripheral = super.availablePeripherals.first(where: { $0.identifier == uuid }) else {
             return
         }
@@ -46,10 +42,11 @@ class BTService: BTServiceDelegate, PBTService {
     }
     
     func restoreConnection() -> Void {
-        guard let activePeripheral else { return }
         invalidateTimer()
         self.timer = Timer(timeInterval: 5, repeats: true) { _ in
-            self.connectToPeripheral(with: activePeripheral.identifier)
+            self.availablePeripherals.forEach {
+                self.connectToPeripheral(with: $0.identifier)
+            }
         }
         RunLoop.main.add(self.timer!, forMode: .common)
     }

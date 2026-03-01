@@ -21,12 +21,10 @@ struct MainView: View {
                     .fontDesign(.rounded)
                 
                 // -> model and manufacturer name
-                if let characteristics = entry.characteristics {
-                    Text(characteristics.modelName)
-                        .foregroundStyle(.secondary)
-                        .padding(.bottom)
-                        .fontDesign(.rounded)
-                }
+                Text(peripheral.characteristics.modelName)
+                    .foregroundStyle(.secondary)
+                    .padding(.bottom)
+                    .fontDesign(.rounded)
                 
                 // -> battery levels
                 BatteryLevelView(entry: entry)

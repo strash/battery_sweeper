@@ -41,10 +41,6 @@ class AppViewModel: PObserver {
         btService.stopScan()
     }
     
-    func connectToPeripheral(with id: UUID?) -> Void {
-        btService.connectToPeripheral(with: id)
-    }
-    
     func onData(_ event: EEvent) -> Void {
         withAnimation {
             switch event {

@@ -10,19 +10,6 @@ import SwiftUI
 
 struct BatterySwidget: Widget {
     let kind: String = "BatterySwidget"
-    
-    private let subject: EventService = .init()
-    private let model: AppModel = .init()
-    private let viewModel: AppViewModel
-    
-    
-    init() {
-        self.viewModel = .init(
-            btManager: BTService.init(with: subject),
-            subject: self.subject,
-            model: self.model
-        )
-    }
 
     var body: some WidgetConfiguration {
         AppIntentConfiguration(

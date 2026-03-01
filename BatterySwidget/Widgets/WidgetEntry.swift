@@ -11,6 +11,5 @@ import WidgetKit
 struct WidgedEntry: TimelineEntry {
     let date: Date
     let peripheral: PeripheralModel?
-    let characteristics: [CharacteristicModel]?
     let family: WidgetFamily
 }

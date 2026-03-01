@@ -12,7 +12,7 @@ struct BatteryLevelView: View {
     let entry: PeripheralDetailsProvider.Entry
     
     var body: some View {
-        if let batteryLevels = entry.characteristics?.batteryLevels {
+        if let batteryLevels = entry.peripheral?.characteristics.batteryLevels {
             let totalLevel = max(0, batteryLevels.reduce(0, { $0 + $1 }) / max(1, batteryLevels.count))
             let (percent, icon) = EBatteryLevelSide.levelIcon(from: totalLevel)
             

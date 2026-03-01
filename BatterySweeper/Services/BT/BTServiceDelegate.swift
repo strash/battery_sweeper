@@ -10,11 +10,12 @@ import CoreBluetooth
 
 class BTServiceDelegate: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
     var central: CBCentralManager!
-    var activePeripheral: CBPeripheral? = nil
     var availablePeripherals: Set<CBPeripheral> = []
     
     var subject: EventService? = nil
     
+    private let option = CBConnectPeripheralOptionEnableAutoReconnect
+
     init(with subject: EventService) {
         super.init()
         central = CBCentralManager(delegate: self, queue: nil)
@@ -44,13 +45,13 @@ class BTServiceDelegate: NSObject, CBCentralManagerDelegate, CBPeripheralDelegat
     
     // on connect to a peripheral
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) -> Void {
-        activePeripheral = peripheral
         peripheral.delegate = self
         peripheral.discoverServices([
             BTConstants.batteryServiceUUID,
             BTConstants.deviceInformationServiceUUID
         ])
         subject?.notify(.connectedToPeripheral(peripheral))
+        self.central.connect(peripheral, options: [option: true])
     }
     
     // on fail to connect to a peripheral
@@ -78,9 +79,6 @@ class BTServiceDelegate: NSObject, CBCentralManagerDelegate, CBPeripheralDelegat
         if let index {
             availablePeripherals.remove(at: index)
             availablePeripherals.insert(peripheral)
-        }
-        if let activePeripheral, activePeripheral.identifier == peripheral.identifier {
-            self.activePeripheral = peripheral
         }
         subject?.notify(.peripheralUpdated(peripheral))
     }
@@ -132,6 +130,9 @@ class BTServiceDelegate: NSObject, CBCentralManagerDelegate, CBPeripheralDelegat
         availablePeripherals.removeAll()
         availablePeripherals.formUnion(peripherals)
         subject?.notify(.peripheralsDiscovered(peripherals))
+        peripherals.forEach {
+            self.central.connect($0, options: [option: true])
+        }
     }
 
     func cancel(_ peripheral: CBPeripheral?) -> Void {
@@ -146,10 +147,6 @@ class BTServiceDelegate: NSObject, CBCentralManagerDelegate, CBPeripheralDelegat
     }
     
     func clean() -> Void {
-        if let activePeripheral {
-            cancel(activePeripheral)
-            self.activePeripheral = nil
-        }
         availablePeripherals.forEach { cancel($0) }
         availablePeripherals.removeAll()
     }

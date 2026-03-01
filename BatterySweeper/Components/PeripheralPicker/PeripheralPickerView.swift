@@ -28,7 +28,6 @@ struct PeripheralPickerView: View {
                 set: { value in
                     withAnimation {
                         model.activePeripheralID = value
-                        viewModel.connectToPeripheral(with: value)
                     }
                 }
             )

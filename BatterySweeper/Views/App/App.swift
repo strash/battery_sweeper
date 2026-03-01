@@ -7,9 +7,6 @@
 
 import SwiftUI
 
-let kMainWindowID: String = "main_window"
-let kSharedGroupName: String = "group.ru.strash.battery_sweeper"
-
 @main
 struct BatterySweeperApp: App {
     private let subject: EventService = .init()
