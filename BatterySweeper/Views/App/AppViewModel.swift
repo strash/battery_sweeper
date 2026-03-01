@@ -58,16 +58,17 @@ class AppViewModel: PObserver {
             case .peripheralsDiscovered(let peripherals):
                 model.peripherals = peripherals.map { .init(from: $0) }
                 model.error = nil
+                model.save()
                 
             case .connectedToPeripheral(let cbPeripheral):
                 if model.peripheral(by: cbPeripheral.identifier) == nil {
-                    model.peripherals.append(.init(from: cbPeripheral))
-                }
-                if let peripheral = model.peripheral(by: cbPeripheral.identifier) {
-                    model.activePeripheralID = peripheral.id
+                    var peripherals = model.peripherals
+                    peripherals.append(.init(from: cbPeripheral))
+                    model.peripherals = peripherals
                 }
                 stopScan()
                 model.error = nil
+                model.save()
                 
             case .failToConnectToPeripheral(let cbPeripheral, let error):
                 if model.activePeripheralID == cbPeripheral.identifier {
@@ -90,6 +91,7 @@ class AppViewModel: PObserver {
                     : $0
                 }
                 model.error = nil
+                model.save()
                 
             case .characteristicsDiscovered(let cbPeripheral, let characteristics):
                 model.peripherals = model.peripherals.map {
@@ -100,6 +102,7 @@ class AppViewModel: PObserver {
                     : $0
                 }
                 model.error = nil
+                model.save()
             }
         }
     }

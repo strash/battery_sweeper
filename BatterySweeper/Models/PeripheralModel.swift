@@ -57,14 +57,33 @@ struct PeripheralModel: Identifiable, Codable, Hashable, Equatable, AppEntity {
 
 struct PeripheralQuery: EntityQuery {
     func entities(for identifiers: [PeripheralModel.ID]) async throws -> [PeripheralModel] {
-        try! await suggestedEntities().filter { identifiers.contains($0.id) }
+        do {
+            return try await suggestedEntities().filter { identifiers.contains($0.id) }
+        } catch {
+            return []
+        }
     }
     
     func suggestedEntities() async throws -> [PeripheralModel] {
-        []
+        guard let userDefs = UserDefaults(suiteName: kSharedGroupName) else {
+            return []
+        }
+        guard let data = userDefs.data(forKey: kPeripheralsKey) else {
+            return []
+        }
+        do {
+            let decoder = JSONDecoder()
+            return try decoder.decode([PeripheralModel].self, from: data)
+        } catch {
+            return []
+        }
     }
     
     func defaultResult() async -> PeripheralModel? {
-        try? await suggestedEntities().first
+        do {
+            return try await suggestedEntities().first
+        } catch {
+            return nil
+        }
     }
 }

@@ -8,6 +8,7 @@
 import Foundation
 import CoreBluetooth
 import SwiftUI
+import WidgetKit
 
 @Observable
 class AppModel {
@@ -25,6 +26,17 @@ class AppModel {
     
     func peripheral(by id: UUID?) -> PeripheralModel? {
         peripherals.first(where: { $0.id == id })
+    }
+    
+    func save() -> Void {
+        guard let userDefs = UserDefaults(suiteName: kSharedGroupName) else {
+            return
+        }
+        let encoder = JSONEncoder()
+        if let data = try? encoder.encode(peripherals) {
+            userDefs.set(data, forKey: kPeripheralsKey)
+            WidgetCenter.shared.reloadAllTimelines()
+        }
     }
 }
 

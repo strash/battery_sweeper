@@ -16,13 +16,13 @@ struct PeripheralDetailsProvider: AppIntentTimelineProvider {
             peripheral: configuration.peripheral,
             family: context.family
         )
-        return Timeline(entries: [entry], policy: .after(Date().addingTimeInterval(5)))
+        return Timeline(entries: [entry], policy: .never)
     }
     
-    func placeholder(in context: Context) -> WidgedEntry {
+    func snapshot(for configuration: SelectPeripheralConfigurationIntent, in context: Context) async -> WidgedEntry {
         .init(
             date: Date(),
-            peripheral: .init(id: .init(), name: "Keyboard", characteristics: [
+            peripheral: configuration.peripheral ?? .init(id: .init(), name: "Keyboard", characteristics: [
                 .init(.batteryLevel(55)),
                 .init(.batteryLevel(65)),
                 .init(.manufacturerName("Apple")),
@@ -31,11 +31,11 @@ struct PeripheralDetailsProvider: AppIntentTimelineProvider {
             family: context.family
         )
     }
-    
-    func snapshot(for configuration: SelectPeripheralConfigurationIntent, in context: Context) async -> WidgedEntry {
+
+    func placeholder(in context: Context) -> WidgedEntry {
         .init(
             date: Date(),
-            peripheral: configuration.peripheral ?? .init(id: .init(), name: "Keyboard", characteristics: [
+            peripheral: .init(id: .init(), name: "Keyboard", characteristics: [
                 .init(.batteryLevel(55)),
                 .init(.batteryLevel(65)),
                 .init(.manufacturerName("Apple")),

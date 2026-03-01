@@ -28,7 +28,7 @@ class BTServiceDelegate: NSObject, CBCentralManagerDelegate, CBPeripheralDelegat
 
     // on update state
     func centralManagerDidUpdateState(_ central: CBCentralManager) -> Void {
-        subject?.notify(.centralStateChanged(central.state))
+        self.subject?.notify(.centralStateChanged(central.state))
         if central.state == .poweredOn {
             retrieveConnectedPeripherals()
         } else {
@@ -40,7 +40,8 @@ class BTServiceDelegate: NSObject, CBCentralManagerDelegate, CBPeripheralDelegat
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) -> Void {
         availablePeripherals.insert(peripheral)
         peripheral.delegate = self
-        subject?.notify(.peripheralsDiscovered([peripheral]))
+        self.subject?.notify(.peripheralsDiscovered([peripheral]))
+        self.central.connect(peripheral, options: [option: true])
     }
     
     // on connect to a peripheral
@@ -50,27 +51,26 @@ class BTServiceDelegate: NSObject, CBCentralManagerDelegate, CBPeripheralDelegat
             BTConstants.batteryServiceUUID,
             BTConstants.deviceInformationServiceUUID
         ])
-        subject?.notify(.connectedToPeripheral(peripheral))
-        self.central.connect(peripheral, options: [option: true])
+        self.subject?.notify(.connectedToPeripheral(peripheral))
     }
     
     // on fail to connect to a peripheral
     func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: (any Error)?) -> Void {
         if let error { print(error) }
-        subject?.notify(.failToConnectToPeripheral(peripheral, error))
+        self.subject?.notify(.failToConnectToPeripheral(peripheral, error))
     }
     
     // on disconnect from a peripheral
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: (any Error)?) -> Void {
         if let error { print(error) }
-        subject?.notify(.disconnectedFromPeripheral(peripheral))
+        self.subject?.notify(.disconnectedFromPeripheral(peripheral))
     }
     
     // on reconnect
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, timestamp: CFAbsoluteTime, isReconnecting: Bool, error: (any Error)?) -> Void {
         if let error { print(error) }
         if isReconnecting {
-            subject?.notify(.connectedToPeripheral(peripheral))
+            self.subject?.notify(.connectedToPeripheral(peripheral))
         }
     }
     
@@ -80,7 +80,7 @@ class BTServiceDelegate: NSObject, CBCentralManagerDelegate, CBPeripheralDelegat
             availablePeripherals.remove(at: index)
             availablePeripherals.insert(peripheral)
         }
-        subject?.notify(.peripheralUpdated(peripheral))
+        self.subject?.notify(.peripheralUpdated(peripheral))
     }
     
     // on discover a services
@@ -118,7 +118,7 @@ class BTServiceDelegate: NSObject, CBCentralManagerDelegate, CBPeripheralDelegat
             .map { $0.toValue }
             .filter { $0 != nil } as! [ECharacteristic]
         if !values.isEmpty {
-            subject?.notify(.characteristicsDiscovered(peripheral, values))
+            self.subject?.notify(.characteristicsDiscovered(peripheral, values))
         }
     }
     
@@ -129,7 +129,7 @@ class BTServiceDelegate: NSObject, CBCentralManagerDelegate, CBPeripheralDelegat
         )
         availablePeripherals.removeAll()
         availablePeripherals.formUnion(peripherals)
-        subject?.notify(.peripheralsDiscovered(peripherals))
+        self.subject?.notify(.peripheralsDiscovered(peripherals))
         peripherals.forEach {
             self.central.connect($0, options: [option: true])
         }

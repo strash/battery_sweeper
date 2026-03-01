@@ -9,3 +9,4 @@ import Foundation
 
 let kMainWindowID: String = "main_window"
 let kSharedGroupName: String = "group.ru.strash.battery_sweeper"
+let kPeripheralsKey: String = "peripherals"

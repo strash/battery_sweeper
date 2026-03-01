@@ -31,15 +31,8 @@ struct MainView: View {
             }
         } else {
             // -> empty state
-            Text("yayaya")
-//            switch model.centralState == .poweredOn {
-//            case true where !model.peripherals.isEmpty:
-//                WelcomeEmptyStateView()
-//            case false:
-//                PowerOffEmptyStateView()
-//            default:
-//                RefreshPeripheralsEmptyStateView()
-//            }
+            Text("Disconnected")
+                .fontDesign(.rounded)
         }
     }
 }
